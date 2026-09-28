@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">WordFlow</string>
+    <string name="title_activity_main">WordFlow</string>
+    <string name="package_name">com.wordflow.english</string>
+    <string name="custom_url_scheme">com.wordflow.english</string>
+</resources>

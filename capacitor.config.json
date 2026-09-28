@@ -1,0 +1,8 @@
+{
+  "appId": "com.wordflow.english",
+  "appName": "WordFlow",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http"
+  }
+}

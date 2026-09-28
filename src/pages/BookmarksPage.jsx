@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { vocabulary, topics } from '../data/vocabulary';
+import { speak } from '../lib/speech';
 
 export default function BookmarksPage() {
   const { starredWords, toggleStar } = useApp();
@@ -13,13 +14,7 @@ export default function BookmarksPage() {
   const starred = allWords.filter(w => starredWords[`${w.topicId}-${w.id}`]);
 
   const handleSpeak = (word) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(word);
-      u.lang = 'en-US';
-      u.rate = 0.85;
-      window.speechSynthesis.speak(u);
-    }
+    speak(word, 0.85);
   };
 
   if (starred.length === 0) {

@@ -37,6 +37,17 @@ app.post('/api/state', async (req, res) => {
 // serve production build if it exists
 const distDir = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(distDir)) {
+  // PWA manifest: correct MIME + short cache
+  app.get('/manifest.webmanifest', (_req, res) => {
+    res.type('application/manifest+json').sendFile(path.join(distDir, 'manifest.webmanifest'));
+  });
+
+  // Service worker: never cache over HTTP so updates land fast
+  app.get('/sw.js', (_req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.type('application/javascript').sendFile(path.join(distDir, 'sw.js'));
+  });
+
   app.use(express.static(distDir, { maxAge: '7d', index: false }));
   app.get(/^\/(?!api\/).*/, (_req, res) => {
     res.sendFile(path.join(distDir, 'index.html'));

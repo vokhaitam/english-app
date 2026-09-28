@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import { vocabulary, topics, getAllWords } from '../data/vocabulary';
 import { grammarLessons } from '../data/grammar';
 import { dailySentences } from '../data/sentences';
+import { speak } from '../lib/speech';
 
 // "Của ngày" indexes: fixed per calendar day, computed once at module load
 const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
@@ -61,13 +62,7 @@ export default function HomePage() {
   const dSentence = dailySentences[dayOfYear % dailySentences.length];
 
   const handleSpeak = (word) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(word);
-      u.lang = 'en-US';
-      u.rate = 0.85;
-      window.speechSynthesis.speak(u);
-    }
+    speak(word, 0.85);
   };
 
   return (
@@ -316,6 +311,8 @@ export default function HomePage() {
       <div className="flex gap-md" style={{ marginTop: '24px', flexWrap: 'wrap' }}>
         <Link to="/study" className="btn btn-primary">📚 Học từ vựng</Link>
         <Link to="/quiz" className="btn btn-secondary">🎯 Làm quiz</Link>
+        <Link to="/word-rain" className="btn btn-secondary">⌨️ Game gõ từ</Link>
+        <Link to="/typing-practice" className="btn btn-secondary">✍️ Luyện ghi từ</Link>
         <Link to="/listening" className="btn btn-secondary">🎧 Luyện nghe</Link>
         <Link to="/bookmarks" className="btn btn-secondary">⭐ Từ đã lưu</Link>
       </div>

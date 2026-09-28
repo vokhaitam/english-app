@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { dailySentences } from '../data/sentences';
+import { speak } from '../lib/speech';
 
 const N = dailySentences.length;
 
@@ -21,13 +22,7 @@ export default function DailySentencePage() {
   const isLearned = !!sentencesLearned[s.id];
 
   const handleSpeak = (rate) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(s.en);
-      u.lang = 'en-US';
-      u.rate = rate ?? 0.85;
-      window.speechSynthesis.speak(u);
-    }
+    speak(s.en, rate ?? 0.85);
   };
 
   const toggleLearned = () => toggleSentenceLearned(s.id);

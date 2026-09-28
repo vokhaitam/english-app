@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { vocabulary, topics } from '../data/vocabulary';
-
-function speak(word, rate = 0.85) {
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(word);
-  u.lang = 'en-US';
-  u.rate = rate;
-  window.speechSynthesis.speak(u);
-}
+import { speak } from '../lib/speech';
 
 const normalize = (s) => s.trim().toLowerCase().replace(/[^a-z\s]/gi, '').replace(/\s+/g, ' ');
 

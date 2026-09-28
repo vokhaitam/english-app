@@ -1,18 +1,21 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import InstallButton from './InstallButton';
 
 const navItems = [
-  { to: '/', icon: '🏠', label: 'Dashboard' },
-  { to: '/study', icon: '📚', label: 'Học từ vựng' },
-  { to: '/grammar', icon: '📘', label: 'Ngữ pháp' },
-  { to: '/grammar-practice', icon: '✍️', label: 'Luyện tập ngữ pháp' },
-  { to: '/review', icon: '🔁', label: 'Ôn tập' },
-  { to: '/daily-sentence', icon: '💬', label: 'Câu giao tiếp' },
-  { to: '/listening', icon: '🎧', label: 'Luyện nghe' },
-  { to: '/quiz', icon: '🎯', label: 'Quiz' },
-  { to: '/bookmarks', icon: '⭐', label: 'Đã đánh dấu' },
-  { to: '/stats', icon: '📊', label: 'Thống kê' },
+  { to: '/', icon: '🏠', label: 'Dashboard', short: 'Trang chủ' },
+  { to: '/study', icon: '📚', label: 'Học từ vựng', short: 'Từ vựng' },
+  { to: '/grammar', icon: '📘', label: 'Ngữ pháp', short: 'Ngữ pháp' },
+  { to: '/grammar-practice', icon: '✍️', label: 'Luyện tập ngữ pháp', short: 'Luyện tập' },
+  { to: '/review', icon: '🔁', label: 'Ôn tập', short: 'Ôn tập' },
+  { to: '/daily-sentence', icon: '💬', label: 'Câu giao tiếp', short: 'Câu mẫu' },
+  { to: '/listening', icon: '🎧', label: 'Luyện nghe', short: 'Luyện nghe' },
+  { to: '/quiz', icon: '🎯', label: 'Quiz', short: 'Quiz' },
+  { to: '/word-rain', icon: '⌨️', label: 'Mưa từ vựng', short: 'Mưa từ' },
+  { to: '/typing-practice', icon: '✍️', label: 'Luyện ghi từ', short: 'Ghi từ' },
+  { to: '/bookmarks', icon: '⭐', label: 'Đã đánh dấu', short: 'Yêu thích' },
+  { to: '/stats', icon: '📊', label: 'Thống kê', short: 'Thống kê' },
 ];
 
 export default function Sidebar() {
@@ -64,8 +67,21 @@ export default function Sidebar() {
             <span>{theme === 'light' ? '🌙' : '☀️'}</span>
             <span>{theme === 'light' ? 'Chế độ tối' : 'Chế độ sáng'}</span>
           </button>
+          <InstallButton />
         </div>
       </aside>
+
+      <InstallButton variant="mobile" />
+
+      {/* Mobile floating theme toggle */}
+      <button
+        className="mobile-theme-toggle"
+        onClick={toggleTheme}
+        title={theme === 'light' ? 'Chuyển chế độ tối' : 'Chuyển chế độ sáng'}
+        aria-label="Đổi sáng/tối"
+      >
+        {theme === 'light' ? '🌙' : '☀️'}
+      </button>
 
       {/* Mobile Nav */}
       <nav className="mobile-nav">
@@ -80,7 +96,7 @@ export default function Sidebar() {
               }
             >
               <span>{item.icon}</span>
-              <span>{item.label.split(' ')[0]}</span>
+              <span>{item.short}</span>
             </NavLink>
           ))}
         </div>

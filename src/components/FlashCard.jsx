@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { speak } from '../lib/speech';
 
 export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, isStarred, onToggleStar, cardIndex, total }) {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -19,13 +20,7 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
 
   const handleSpeak = (e) => {
     e.stopPropagation();
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(word.word);
-      utterance.lang = 'en-US';
-      utterance.rate = 0.85;
-      window.speechSynthesis.speak(utterance);
-    }
+    speak(word.word, 0.85);
   };
 
   const handleKnow = (e) => {

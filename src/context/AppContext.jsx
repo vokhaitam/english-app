@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { todayKey, getWeekHistory as getWeekHistoryData } from '../lib/dateHelpers';
 
+const API_BASE = import.meta.env.VITE_API_BASE || '';
+
 const AppContext = createContext(null);
 
 const REVIEW_INTERVALS = [0, 10 * 60 * 1000, 24 * 60 * 60 * 1000, 3 * 24 * 60 * 60 * 1000, 7 * 24 * 60 * 60 * 1000, 21 * 24 * 60 * 60 * 1000];
@@ -56,7 +58,7 @@ export function AppProvider({ children }) {
     let cancelled = false;
     (async () => {
       try {
-        const r = await fetch('/api/state');
+        const r = await fetch(`${API_BASE}/api/state`);
         if (r.ok) {
           const data = await r.json();
           if (!cancelled && data && typeof data === 'object') {
@@ -93,7 +95,7 @@ export function AppProvider({ children }) {
   useEffect(() => {
     if (!loadedRef.current) return;
     const t = setTimeout(() => {
-      fetch('/api/state', {
+      fetch(`${API_BASE}/api/state`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(snapshot()),

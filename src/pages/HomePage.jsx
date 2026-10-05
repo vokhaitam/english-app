@@ -1,9 +1,7 @@
 import React, { useMemo } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { vocabulary, topics, getAllWords } from '../data/vocabulary';
-import { grammarLessons } from '../data/grammar';
-import { dailySentences } from '../data/sentences';
 import { speak } from '../lib/speech';
 
 // "Của ngày" indexes: fixed per calendar day, computed once at module load
@@ -40,6 +38,7 @@ function StreakCalendar({ streak }) {
 }
 
 export default function HomePage() {
+  const { vocabulary, topics, getAllWords, grammarLessons, dailySentences } = useLanguage();
   const {
     getTotalKnown, getTotalStarred, getAvgQuizScore, streakDays, quizScores,
     knownWords, getTodayCount, dailyGoal, getReviewCount, getLevel, xp,
@@ -56,7 +55,7 @@ export default function HomePage() {
   const dueReviews = getReviewCount();
 
   // Word of the day + grammar tip: deterministic by day-of-year
-  const allWords = useMemo(() => getAllWords(), []);
+  const allWords = useMemo(() => getAllWords(), [getAllWords]);
   const wod = allWords[dayOfYear % allWords.length];
   const gTip = grammarLessons[dayOfYear % grammarLessons.length];
   const dSentence = dailySentences[dayOfYear % dailySentences.length];

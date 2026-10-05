@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { useApp } from '../context/AppContext';
-import { dailySentences } from '../data/sentences';
 import { speak } from '../lib/speech';
 
-const N = dailySentences.length;
-
-const getTodayIndex = () => {
+const getTodayIndex = (length) => {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
-  return Math.floor((now - start) / 86400000) % N;
+  return Math.floor((now - start) / 86400000) % length;
 };
 
 export default function DailySentencePage() {
+  const { dailySentences } = useLanguage();
   const { sentencesLearned, toggleSentenceLearned } = useApp();
-  const baseIndex = getTodayIndex();
+  const N = dailySentences.length;
+  const baseIndex = getTodayIndex(N);
   const [offset, setOffset] = useState(0);
   const [hideEn, setHideEn] = useState(false);
 

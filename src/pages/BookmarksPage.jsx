@@ -1,9 +1,11 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
+import { wordKey } from '../lib/wordKey';
 import { useApp } from '../context/AppContext';
-import { vocabulary, topics } from '../data/vocabulary';
 import { speak } from '../lib/speech';
 
 export default function BookmarksPage() {
+  const { vocabulary, topics, lang } = useLanguage();
   const { starredWords, toggleStar } = useApp();
 
   // Collect all starred words
@@ -11,7 +13,7 @@ export default function BookmarksPage() {
     words.map(w => ({ ...w, topicId }))
   );
 
-  const starred = allWords.filter(w => starredWords[`${w.topicId}-${w.id}`]);
+  const starred = allWords.filter(w => starredWords[wordKey(lang, w.topicId, w.id)]);
 
   const handleSpeak = (word) => {
     speak(word, 0.85);
@@ -45,9 +47,9 @@ export default function BookmarksPage() {
       <div style={{ display: 'grid', gap: '12px' }}>
         {starred.map(word => {
           const topic = topics.find(t => t.id === word.topicId);
-          const wordKey = `${word.topicId}-${word.id}`;
+          const key = wordKey(lang, word.topicId, word.id);
           return (
-            <div key={wordKey} className="card" style={{ padding: '20px 24px' }}>
+            <div key={key} className="card" style={{ padding: '20px 24px' }}>
               <div className="flex items-center justify-between">
                 <div style={{ flex: 1 }}>
                   <div className="flex items-center gap-md" style={{ marginBottom: '6px' }}>
@@ -91,7 +93,7 @@ export default function BookmarksPage() {
                   <button
                     className="btn btn-icon"
                     style={{ background: 'rgba(251,191,36,0.15)', border: '1px solid rgba(251,191,36,0.3)', color: 'var(--accent-yellow)' }}
-                    onClick={() => toggleStar(wordKey)}
+                    onClick={() => toggleStar(key)}
                     title="Bỏ đánh dấu"
                   >
                     ⭐

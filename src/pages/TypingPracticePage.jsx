@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { topics, vocabulary } from '../data/vocabulary';
+import { useLanguage } from '../context/LanguageContext';
 import { useApp } from '../context/AppContext';
 import { speak } from '../lib/speech';
 
@@ -66,7 +66,7 @@ function shuffleArray(arr) {
   return a;
 }
 
-function buildPool(topicId) {
+function buildPool(topicId, vocabulary) {
   if (topicId === 'all') {
     return Object.entries(vocabulary).flatMap(([tid, ws]) => ws.map(w => ({ ...w, topicId: tid })));
   }
@@ -74,6 +74,7 @@ function buildPool(topicId) {
 }
 
 export default function TypingPracticePage() {
+  const { topics, vocabulary } = useLanguage();
   const { markKnown, markUnknown } = useApp();
   const [dir, setDir] = useState('en2vi'); // 'en2vi' | 'vi2en'
   const [phase, setPhase] = useState('topic'); // 'topic' | 'playing' | 'done'
@@ -90,6 +91,7 @@ export default function TypingPracticePage() {
 
   const topic = topics.find(t => t.id === topicId);
   const current = pool[idx] || null;
+  const pron = current?.pronunciation || current?.romaji || '';
   const total = pool.length;
 
   useEffect(() => {
@@ -98,7 +100,7 @@ export default function TypingPracticePage() {
 
   const start = (tid) => {
     setTopicId(tid);
-    setPool(shuffleArray(buildPool(tid)));
+    setPool(shuffleArray(buildPool(tid, vocabulary)));
     setIdx(0);
     setCorrect(0);
     setWrong(0);
@@ -110,7 +112,9 @@ export default function TypingPracticePage() {
 
   const submit = () => {
     if (!current || feedback) return;
-    const ok = dir === 'en2vi' ? isViAnswer(input, current.meaning) : isEnAnswer(input, current.word);
+    const ok = dir === 'en2vi'
+      ? isViAnswer(input, current.meaning)
+      : (isEnAnswer(input, current.word) || (current.romaji ? isEnAnswer(input, current.romaji) : false));
     if (ok) {
       const key = `${current.topicId}-${current.id}`;
       if (!awardedRef.current.has(key)) {
@@ -300,7 +304,7 @@ export default function TypingPracticePage() {
           {returning ? (
             <>
               <div className="tp-word">{current.word}</div>
-              <div className="tp-pron">{current.pronunciation}</div>
+              <div className="tp-pron">{pron}</div>
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
@@ -317,7 +321,7 @@ export default function TypingPracticePage() {
               </div>
               {feedback ? (
                 <div className="tp-pron" style={{ marginTop: '8px' }}>
-                  {current.word} {current.pronunciation}{' '}
+                  {current.word} {pron}{' '}
                   <em style={{ color: 'var(--text-muted)' }}>{TYPE_LABELS[current.type] || current.type}</em>
                 </div>
               ) : null}
@@ -337,7 +341,7 @@ export default function TypingPracticePage() {
               <div className="tp-reveal">
                 {returning
                   ? <>Nghĩa đúng: <strong>{current.meaning}</strong></>
-                  : <>Từ đúng: <strong>{current.word}</strong> {current.pronunciation}</>}
+                  : <>Từ đúng: <strong>{current.word}</strong> {pron}</>}
               </div>
             </div>
           )}

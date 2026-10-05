@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
+import { useLanguage } from '../context/LanguageContext';
+import { splitWordKey } from '../lib/wordKey';
 import { useApp } from '../context/AppContext';
-import { vocabulary, topics } from '../data/vocabulary';
 import FlashCard from '../components/FlashCard';
 
 export default function ReviewPage() {
+  const { vocabulary, topics } = useLanguage();
   const { getDueReviews, reviewCard, isStarred, toggleStar } = useApp();
   const [queueIdx, setQueueIdx] = useState(0);
   const [completed, setCompleted] = useState(false);
@@ -17,14 +19,13 @@ export default function ReviewPage() {
 
   const wordData = useMemo(() => {
     if (!current) return null;
-    const sep = current.key.lastIndexOf('-');
-    const topicId = current.key.slice(0, sep);
-    const wordId = parseInt(current.key.slice(sep + 1), 10);
-    const topicWords = vocabulary[topicId] || [];
-    const word = topicWords.find(w => w.id === wordId);
-    const topic = topics.find(t => t.id === topicId);
-    return word && topic ? { word, topic, topicId, wordId, wordKey: current.key } : null;
-  }, [current]);
+    const parsed = splitWordKey(current.key);
+    if (!parsed) return null;
+    const topicWords = vocabulary[parsed.topicId] || [];
+    const word = topicWords.find(w => w.id === parsed.wordId);
+    const topic = topics.find(t => t.id === parsed.topicId);
+    return word && topic ? { word, topic, topicId: parsed.topicId, wordId: parsed.wordId, wordKey: current.key } : null;
+  }, [current, vocabulary, topics]);
 
   const advance = (known) => {
     if (known) setKnownCount(k => k + 1);

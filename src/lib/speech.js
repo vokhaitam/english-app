@@ -1,6 +1,19 @@
 let audioEl = null;
 let voices = [];
 let speakSeq = 0;
+// null = tự nhận diện theo nội dung (tiếng Nhật nếu có kana/kanji).
+let forcedLang = null;
+
+const JAPANESE_RE = /[\u3040-\u30ff\u4e00-\u9fff]/;
+
+export function setSpeechLang(lang) {
+  forcedLang = lang === 'ja' || lang === 'en' ? lang : null;
+}
+
+function resolveLang(text) {
+  if (forcedLang) return forcedLang;
+  return JAPANESE_RE.test(text) ? 'ja' : 'en';
+}
 
 function getAudio() {
   if (!audioEl) {
@@ -67,6 +80,26 @@ function pickNiceEnglishVoice() {
   return en[0];
 }
 
+function pickJapaneseVoice() {
+  const ja = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('ja'));
+  if (ja.length === 0) return null;
+
+  const byRegion = ja.find(v => v.lang.toLowerCase() === 'ja-jp');
+  if (byRegion) return byRegion;
+
+  const natural = ja.find(v => /natural|online|neural|premium|premium/i.test(v.name));
+  if (natural) return natural;
+
+  const female = ja.find(v => /female|woman|kyoko|haruka|o-ren/i.test(v.name));
+  if (female) return female;
+
+  return ja[0];
+}
+
+function pickVoice(lang) {
+  return lang === 'ja' ? pickJapaneseVoice() : pickNiceEnglishVoice();
+}
+
 function speakNative(text, rate) {
   return new Promise((resolve) => {
     if (!('speechSynthesis' in window)) {
@@ -77,13 +110,14 @@ function speakNative(text, rate) {
     synth.cancel();
     synth.resume(); // Chrome workaround: sometimes hangs until resume
 
+    const lang = resolveLang(text);
     const u = new SpeechSynthesisUtterance(text);
-    const voice = pickNiceEnglishVoice();
+    const voice = pickVoice(lang);
     if (voice) {
       u.voice = voice;
       u.lang = voice.lang;
     } else {
-      u.lang = 'en-US';
+      u.lang = lang === 'ja' ? 'ja-JP' : 'en-US';
     }
     u.rate = rate;
     u.pitch = 1;
@@ -97,7 +131,8 @@ function speakNative(text, rate) {
 function playPart(text, rate) {
   const el = getAudio();
   el.playbackRate = Math.max(0.25, Math.min(2, rate));
-  el.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodeURIComponent(text)}`;
+  const tl = resolveLang(text);
+  el.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${tl}&q=${encodeURIComponent(text)}`;
   return el.play().then(
     () => new Promise((resolve) => {
       el.onended = resolve;

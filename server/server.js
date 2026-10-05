@@ -54,7 +54,8 @@ if (fs.existsSync(distDir)) {
   });
 }
 
-const port = 3001;
+const port = Number(process.env.PORT || 3001);
+const host = process.env.HOST || '0.0.0.0';
 
 await initDb();
-app.listen(port, () => console.log(`Backend running on http://localhost:${port}`));
+app.listen(port, host, () => console.log(`Backend running on http://${host}:${port}`));

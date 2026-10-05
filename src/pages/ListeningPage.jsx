@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { useApp } from '../context/AppContext';
-import { vocabulary, topics } from '../data/vocabulary';
 import { speak } from '../lib/speech';
 
 const normalize = (s) => s.trim().toLowerCase().replace(/[^a-z\s]/gi, '').replace(/\s+/g, ' ');
 
+// Tiếng Nhật gõ bằng romaji, tiếng Anh gõ bằng chính từ.
+const answerFor = (w) => (w.romaji || w.word);
+
 export default function ListeningPage() {
+  const { vocabulary, topics } = useLanguage();
   const { addQuizScore } = useApp();
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [mode, setMode] = useState('select');
@@ -93,11 +97,11 @@ export default function ListeningPage() {
 
   const q = queue[current];
   const normalized = normalize(typed);
-  const isCorrect = answered && normalized === normalize(q.word);
+  const isCorrect = answered && normalized === normalize(answerFor(q));
 
   const check = () => {
     setAnswered(true);
-    if (normalized === normalize(q.word)) {
+    if (normalized === normalize(answerFor(q))) {
       setScore(s => s + 1);
     } else {
       setWrong(w => [...w, q]);
@@ -153,7 +157,7 @@ export default function ListeningPage() {
         {answered && (
           <div className="fade-in" style={{ marginTop: '16px' }}>
             <p style={{ fontWeight: '600', color: isCorrect ? 'var(--accent-green)' : 'var(--accent-red)' }}>
-              {isCorrect ? '✅ Chính xác!' : `❌ Đáp án: ${q.word} — ${q.meaning}`}
+              {isCorrect ? '✅ Chính xác!' : `❌ Đáp án: ${q.word}${q.romaji ? ` (${q.romaji})` : ''} — ${q.meaning}`}
             </p>
           </div>
         )}

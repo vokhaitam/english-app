@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { vocabulary, topics } from '../data/vocabulary';
+import { useLanguage } from '../context/LanguageContext';
 import { useApp } from '../context/AppContext';
 
 function shuffleArray(arr) {
@@ -23,6 +23,7 @@ function generateOptions(correctWord, allWords) {
 }
 
 export default function QuizPage() {
+  const { vocabulary, topics } = useLanguage();
   const { addQuizScore } = useApp();
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [numQuestions, setNumQuestions] = useState(10);
@@ -259,7 +260,7 @@ export default function QuizPage() {
         </div>
         {isEnVi && (
           <div style={{ color: 'var(--text-secondary)', fontStyle: 'italic', marginTop: '8px' }}>
-            {q.word.pronunciation}
+            {q.word.pronunciation || q.word.romaji}
           </div>
         )}
       </div>

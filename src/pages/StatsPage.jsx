@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
+import { splitWordKey } from '../lib/wordKey';
 import { useApp } from '../context/AppContext';
-import { vocabulary, topics } from '../data/vocabulary';
 
 function RadialProgress({ value, size = 80, strokeWidth = 7, color = 'var(--accent-primary)' }) {
   const r = (size - strokeWidth * 2) / 2;
@@ -22,11 +23,12 @@ function RadialProgress({ value, size = 80, strokeWidth = 7, color = 'var(--acce
 }
 
 export default function StatsPage() {
+  const { vocabulary, topics } = useLanguage();
   const {
-    knownWords, quizScores, streakDays, getTotalKnown, getTotalStarred,
+    quizScores, streakDays, getTotalKnown, getTotalStarred,
     getAvgQuizScore, getBestQuizScore, getWeekHistory, getLevel, getLevelProgress,
     xp, dailyGoal, setDailyGoal, getTodayCount, getTopMistakes,
-    exportData, importData, resetProgress, getTotalInReview,
+    exportData, importData, resetProgress, getTotalInReview, getTopicProgress,
   } = useApp();
   const fileRef = useRef(null);
   const [msg, setMsg] = useState('');
@@ -164,11 +166,9 @@ export default function StatsPage() {
           <h2 className="section-title" style={{ marginBottom: '16px' }}>⚠️ Từ hay sai nhất</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {topMistakes.map((m) => {
-              const sep = m.key.lastIndexOf('-');
-              const topicId = m.key.slice(0, sep);
-              const idStr = m.key.slice(sep + 1);
-              const word = (vocabulary[topicId] || []).find(w => w.id === parseInt(idStr, 10));
-              const topic = topics.find(t => t.id === topicId);
+              const parsed = splitWordKey(m.key);
+              const word = parsed ? (vocabulary[parsed.topicId] || []).find(w => w.id === Number(parsed.wordId)) : null;
+              const topic = parsed ? topics.find(t => t.id === parsed.topicId) : null;
               return (
                 <div key={m.key} className="flex items-center justify-between" style={{ padding: '10px 14px', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
                   <div className="flex items-center gap-md">
@@ -191,7 +191,7 @@ export default function StatsPage() {
         <h2 className="section-title" style={{ marginBottom: '20px' }}>📚 Tiến trình theo chủ đề</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {topics.map(topic => {
-            const known = (knownWords[topic.id] || []).length;
+            const known = getTopicProgress(topic.id);
             const total = vocabulary[topic.id]?.length || 0;
             const pct = total > 0 ? Math.round((known / total) * 100) : 0;
             return (

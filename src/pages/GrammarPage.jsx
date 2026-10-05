@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { useSearchParams } from 'react-router-dom';
-import { grammarLessons } from '../data/grammar';
 
 const normalize = (s) => s.trim().toLowerCase().replace(/\s+/g, ' ');
 
 export default function GrammarPage() {
+  const { grammarLessons } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const rawId = searchParams.get('id');
   const selectedId = rawId && grammarLessons.some(l => l.id === rawId) ? rawId : null;
@@ -164,9 +165,16 @@ export default function GrammarPage() {
       <div className="card" style={{ marginBottom: '24px' }}>
         <h2 className="section-title" style={{ marginBottom: '12px' }}>🧾 Công thức</h2>
         <div className="grammar-formula-list">
-          {lesson.formula.map((f, i) => (
-            <div key={i} className="grammar-formula">{f}</div>
-          ))}
+          {lesson.formula.map((f, i) => {
+            const text = typeof f === 'string' ? f : f.text;
+            const reading = typeof f === 'string' ? '' : f.reading;
+            return (
+              <div key={i} className="grammar-formula">
+                <span>{text}</span>
+                {reading && <span className="grammar-reading">{reading}</span>}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -194,7 +202,15 @@ export default function GrammarPage() {
           {lesson.examples.flat().map((ex, i) => (
             <div key={i} className="grammar-example">
               <span className="grammar-example-arrow">→</span>
-              <span>{ex}</span>
+              {typeof ex === 'string' ? (
+                <span>{ex}</span>
+              ) : (
+                <span className="grammar-example-stack">
+                  <span className="grammar-example-jp">{ex.jp}</span>
+                  {ex.reading && <span className="grammar-example-reading">{ex.reading}</span>}
+                  <span className="grammar-example-vi">{ex.vi}</span>
+                </span>
+              )}
             </div>
           ))}
         </div>

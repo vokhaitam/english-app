@@ -23,6 +23,9 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
     speak(word.word, 0.85);
   };
 
+  const reading = word.reading && word.reading !== word.word ? word.reading : '';
+  const pronunciation = word.pronunciation || word.romaji || '';
+
   const handleKnow = (e) => {
     e.stopPropagation();
     setDirection('next');
@@ -76,37 +79,51 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
       </div>
 
       {/* Card */}
-      <div
-        key={`${direction}-${word.id}`}
-        className={`flashcard-scene ${direction === 'prev' ? 'flashcard-enter-left' : 'flashcard-enter-right'}`}
-        style={{
-          opacity: isAnimating ? 0.4 : 1,
-          transition: 'opacity 0.25s ease',
-          transform: isAnimating ? (direction === 'next' ? 'translateX(-40px)' : 'translateX(40px)') : 'none',
-        }}
-      >
+      <div className="flashcard-card-3d">
         <div
-          className={`flashcard-wrapper ${isFlipped ? 'flipped' : ''}`}
-          onClick={handleFlip}
-          style={{ minHeight: '260px' }}
+          key={`${direction}-${word.id}`}
+          className={`flashcard-scene ${direction === 'prev' ? 'flashcard-enter-left' : 'flashcard-enter-right'}`}
         >
-          {/* Front */}
-          <div className="flashcard-face flashcard-front">
-            <span className="card-hint">Nhấn để xem nghĩa 👆</span>
-            {word.type && (
-              <span className="card-type-badge">
-                <span className="badge badge-purple">{word.type}</span>
-              </span>
-            )}
-            <div className="card-word">{word.word}</div>
-            <div className="card-pronunciation">{word.pronunciation}</div>
-          </div>
+          <div
+            className="flashcard-shift"
+            style={{
+              opacity: isAnimating ? 0.4 : 1,
+              transition: 'opacity 0.25s ease',
+              transform: isAnimating ? (direction === 'next' ? 'translateX(-40px)' : 'translateX(40px)') : 'none',
+            }}
+          >
+            <div
+              className={`flashcard-wrapper ${isFlipped ? 'flipped' : ''}`}
+              onClick={handleFlip}
+              style={{ minHeight: '260px' }}
+            >
+              {/* Front */}
+              <div className="flashcard-face flashcard-front">
+                <span className="card-hint">Nhấn để xem nghĩa 👆</span>
+                {word.type && (
+                  <span className="card-type-badge">
+                    <span className="badge badge-purple">{word.type}</span>
+                  </span>
+                )}
+                <div className="flashcard-clip">
+                  <div className="card-word">{word.word}</div>
+                  {reading && <div className="card-reading">{reading}</div>}
+                  {pronunciation && <div className="card-pronunciation">{pronunciation}</div>}
+                </div>
+              </div>
 
-          {/* Back */}
-          <div className="flashcard-face flashcard-back">
-            <span className="card-hint">✅ Nghĩa của từ</span>
-            <div className="card-meaning">{word.meaning}</div>
-            <div className="card-example">"{word.example}"</div>
+              {/* Back */}
+              <div className="flashcard-face flashcard-back">
+                <span className="card-hint">✅ Nghĩa của từ</span>
+                <div className="flashcard-clip">
+                  <div className="card-meaning">{word.meaning}</div>
+                  <div className="card-example">"{word.example}"</div>
+                  {word.exampleMeaning && (
+                    <div className="card-example-meaning">{word.exampleMeaning}</div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

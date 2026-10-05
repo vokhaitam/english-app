@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { useLanguage } from '../context/LanguageContext';
 import InstallButton from './InstallButton';
 
 const navItems = [
@@ -20,6 +21,7 @@ const navItems = [
 
 export default function Sidebar() {
   const { getReviewCount, theme, toggleTheme, getLevel, xp } = useApp();
+  const { lang, languages, selectLanguage, pack } = useLanguage();
   const dueCount = getReviewCount();
 
   return (
@@ -27,9 +29,35 @@ export default function Sidebar() {
       {/* Desktop Sidebar */}
       <aside className="sidebar">
         <NavLink to="/" className="sidebar-logo">
-          <div className="sidebar-logo-icon">🇬🇧</div>
+          <div className="sidebar-logo-icon">{pack.flag}</div>
           <span className="sidebar-logo-text">WordFlow</span>
         </NavLink>
+
+        <div
+          className="lang-switch"
+          role="group"
+          aria-label="Chọn ngôn ngữ học"
+          style={{ '--lang-count': languages.length }}
+        >
+          <span
+            className="lang-switch-thumb"
+            style={{ transform: `translateX(${Math.max(0, languages.findIndex(l => l.id === lang)) * 100}%)` }}
+            aria-hidden="true"
+          />
+          {languages.map(l => (
+            <button
+              key={l.id}
+              type="button"
+              className={`lang-switch-btn ${l.id === lang ? 'active' : ''}`}
+              onClick={() => selectLanguage(l.id)}
+              aria-pressed={l.id === lang}
+              title={`Học ${l.name}`}
+            >
+              <span className="lang-switch-flag" aria-hidden="true">{l.flag}</span>
+              <span className="lang-switch-name">{l.nativeName}</span>
+            </button>
+          ))}
+        </div>
 
         <nav className="sidebar-nav">
           {navItems.map(item => (

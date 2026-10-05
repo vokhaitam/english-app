@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { topics, vocabulary } from '../data/vocabulary';
+import { useLanguage } from '../context/LanguageContext';
 import { useApp } from '../context/AppContext';
 import { speak } from '../lib/speech';
 
@@ -24,11 +24,16 @@ function shuffleArray(arr) {
   return a;
 }
 
-function buildPool(topicId) {
+function buildPool(topicId, vocabulary) {
   if (topicId === 'all') {
     return Object.entries(vocabulary).flatMap(([tid, ws]) => ws.map(w => ({ ...w, topicId: tid })));
   }
   return (vocabulary[topicId] || []).map(w => ({ ...w, topicId }));
+}
+
+// Tiếng Nhật gõ bằng romaji (bỏ khoảng trắng), tiếng Anh gõ bằng chính từ.
+function answerOf(w) {
+  return w.romaji ? w.romaji.replace(/\s+/g, '') : w.word;
 }
 
 function buildLetterStock() {
@@ -108,7 +113,7 @@ function destroyWord(g, w) {
     words: g.words.filter(x => x.uid !== w.uid),
     popups: [
       ...g.popups.filter(p => g.t - p.born < POPUP_MS),
-      { uid: g.uidSeq + 1, x: w.x, y: w.y, meaning: w.meaning, pronunciation: w.pronunciation, born: g.t },
+      { uid: g.uidSeq + 1, x: w.x, y: w.y, meaning: w.meaning, pronunciation: w.pronunciation, romaji: w.romaji, born: g.t },
     ],
     score: g.score + pts,
     typedCount: g.typedCount + 1,
@@ -128,6 +133,7 @@ function destroyLetter(g, w, ch, ok) {
 }
 
 export default function WordRainPage() {
+  const { topics, vocabulary } = useLanguage();
   const { markKnown } = useApp();
   const [phase, setPhase] = useState('mode'); // 'mode' | 'topic' | 'config' | 'playing'
   const [mode, setMode] = useState('vocab'); // 'vocab' | 'letters'
@@ -194,7 +200,7 @@ export default function WordRainPage() {
   }, [markKnown]);
 
   const start = useCallback(() => {
-    const stock = mode === 'letters' ? buildLetterStock() : shuffleArray(buildPool(selectedTopic || 'all'));
+    const stock = mode === 'letters' ? buildLetterStock() : shuffleArray(buildPool(selectedTopic || 'all', vocabulary));
     setGame({
       status: 'playing',
       mode,
@@ -220,15 +226,15 @@ export default function WordRainPage() {
     pausedRef.current = false;
     setPaused(false);
     setPhase('playing');
-  }, [mode, selectedTopic, difficulty]);
+  }, [mode, selectedTopic, difficulty, vocabulary]);
 
   const handleTyping = useCallback((text) => {
     setTyped(text);
     const g = gameRef.current;
     if (!g || g.status !== 'playing' || pausedRef.current) return;
 
-    const lower = text.toLowerCase();
-    const full = g.words.find(w => w.status === 'falling' && w.word.toLowerCase() === lower);
+    const lower = text.toLowerCase().replace(/\s+/g, '');
+    const full = g.words.find(w => w.status === 'falling' && answerOf(w).toLowerCase() === lower);
     if (full) {
       setGame(prev => (prev ? destroyWord(prev, full) : prev));
       award(full);
@@ -238,14 +244,15 @@ export default function WordRainPage() {
     }
 
     const target = lower
-      ? g.words.find(w => w.status === 'falling' && w.word.toLowerCase().startsWith(lower))
+      ? g.words.find(w => w.status === 'falling' && answerOf(w).toLowerCase().startsWith(lower))
       : null;
     setGame(prev => (prev
       ? {
           ...prev,
           words: prev.words.map(w => {
             if (w.status !== 'falling') return w;
-            const nm = w.uid === target?.uid ? lower.length : 0;
+            const ratio = target?.uid === w.uid ? Math.min(1, lower.length / answerOf(w).length) : 0;
+            const nm = Math.round(ratio * w.label.length);
             return nm === w.matched ? w : { ...w, matched: nm };
           }),
         }
@@ -258,8 +265,8 @@ export default function WordRainPage() {
       const g = gameRef.current;
       const text = typedRef.current;
       if (!g || g.status !== 'playing' || pausedRef.current || !text.trim()) return;
-      const lower = text.toLowerCase();
-      const target = g.words.find(w => w.status === 'falling' && w.word.toLowerCase().startsWith(lower));
+      const lower = text.toLowerCase().replace(/\s+/g, '');
+      const target = g.words.find(w => w.status === 'falling' && answerOf(w).toLowerCase().startsWith(lower));
       if (target) {
         setGame(prev => (prev ? destroyWord(prev, target) : prev));
         award(target);
@@ -497,7 +504,7 @@ export default function WordRainPage() {
           {mode === 'vocab' && game.popups.map(p => (
             <div key={p.uid} className="game-popup" style={{ left: `${p.x}%`, top: `${p.y * 100}%` }}>
               <div className="game-popup-vi">{p.meaning}</div>
-              <div className="game-popup-pron">{p.pronunciation}</div>
+              <div className="game-popup-pron">{p.pronunciation || p.romaji}</div>
             </div>
           ))}
 

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { grammarPractice } from '../data/practice';
+import { useLanguage } from '../context/LanguageContext';
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 
 export default function GrammarPracticePage() {
+  const { grammarPractice } = useLanguage();
   const [screen, setScreen] = useState('start'); // 'start' | 'quiz' | 'done'
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);

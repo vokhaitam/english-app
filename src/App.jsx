@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
+import { LanguageProvider } from './context/LanguageContext';
 import Sidebar from './components/Sidebar';
 import Mascot from './components/Mascot';
 
@@ -33,32 +34,34 @@ function SmartMascot() {
 
 function App() {
   return (
-    <AppProvider>
-      <Router>
-        <div className="app-layout">
-          <Sidebar />
-          <main className="main-content">
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/study" element={<StudyPage />} />
-                <Route path="/grammar" element={<GrammarPage />} />
-                <Route path="/grammar-practice" element={<GrammarPracticePage />} />
-                <Route path="/review" element={<ReviewPage />} />
-                <Route path="/listening" element={<ListeningPage />} />
-                <Route path="/daily-sentence" element={<DailySentencePage />} />
-                <Route path="/quiz" element={<QuizPage />} />
-                <Route path="/word-rain" element={<WordRainPage />} />
-<Route path="/typing-practice" element={<TypingPracticePage />} />
-                <Route path="/bookmarks" element={<BookmarksPage />} />
-                <Route path="/stats" element={<StatsPage />} />
-              </Routes>
-            </Suspense>
-          </main>
-<SmartMascot />
-        </div>
-      </Router>
-    </AppProvider>
+    <LanguageProvider>
+      <AppProvider>
+        <Router>
+          <div className="app-layout">
+            <Sidebar />
+            <main className="main-content">
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/study" element={<StudyPage />} />
+                  <Route path="/grammar" element={<GrammarPage />} />
+                  <Route path="/grammar-practice" element={<GrammarPracticePage />} />
+                  <Route path="/review" element={<ReviewPage />} />
+                  <Route path="/listening" element={<ListeningPage />} />
+                  <Route path="/daily-sentence" element={<DailySentencePage />} />
+                  <Route path="/quiz" element={<QuizPage />} />
+                  <Route path="/word-rain" element={<WordRainPage />} />
+                  <Route path="/typing-practice" element={<TypingPracticePage />} />
+                  <Route path="/bookmarks" element={<BookmarksPage />} />
+                  <Route path="/stats" element={<StatsPage />} />
+                </Routes>
+              </Suspense>
+            </main>
+            <SmartMascot />
+          </div>
+        </Router>
+      </AppProvider>
+    </LanguageProvider>
   );
 }
 

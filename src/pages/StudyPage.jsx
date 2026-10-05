@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { vocabulary, topics, levels, getAllWords } from '../data/vocabulary';
 import FlashCard from '../components/FlashCard';
 import TopicSelector from '../components/TopicSelector';
 
@@ -16,6 +16,7 @@ const TYPE_LABELS = {
 };
 
 export default function StudyPage() {
+  const { vocabulary, topics, levels, getAllWords, lang } = useLanguage();
   const { markKnown, markUnknown, isStarred, toggleStar, knownWords } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
   const level = searchParams.get('level');
@@ -43,7 +44,7 @@ export default function StudyPage() {
     setIsCompleted(false);
   }
 
-  const allWords = useMemo(() => getAllWords(), []);
+  const allWords = useMemo(() => getAllWords(), [getAllWords]);
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const q = searchQuery.trim().toLowerCase();
@@ -149,7 +150,7 @@ export default function StudyPage() {
                     const levelData = levels.find(l => l.id === topicData?.level);
                     return (
                       <div
-                        key={`${r.topicId}-${r.id}`}
+                        key={`${lang}:${r.topicId}-${r.id}`}
                         onClick={() => setSearchParams({ level: topicData?.level, topic: r.topicId, w: r.id })}
                         className="search-result-item"
                         style={{ animationDelay: `${i * 30}ms` }}

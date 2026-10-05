@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { todayKey, getWeekHistory as getWeekHistoryData } from '../lib/dateHelpers';
+import { wordKey, topicKey, wordKeyLang, migrateLegacyObject } from '../lib/wordKey';
+import { useLanguage } from './LanguageContext';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 
@@ -19,11 +21,13 @@ function load(key, fallback) {
 }
 
 export function AppProvider({ children }) {
+  const { lang } = useLanguage();
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
-  const [knownWords, setKnownWords] = useState(() => load('knownWords', {}));
-  const [starredWords, setStarredWords] = useState(() => load('starredWords', {}));
-  const [reviewItems, setReviewItems] = useState(() => load('reviewItems', {}));
-  const [mistakes, setMistakes] = useState(() => load('mistakes', {}));
+  // Khoá cũ chưa có namespace thì mặc định là tiếng Anh.
+  const [knownWords, setKnownWords] = useState(() => migrateLegacyObject(load('knownWords', {})));
+  const [starredWords, setStarredWords] = useState(() => migrateLegacyObject(load('starredWords', {})));
+  const [reviewItems, setReviewItems] = useState(() => migrateLegacyObject(load('reviewItems', {})));
+  const [mistakes, setMistakes] = useState(() => migrateLegacyObject(load('mistakes', {})));
   const [studyHistory, setStudyHistory] = useState(() => load('studyHistory', []));
   const [quizScores, setQuizScores] = useState(() => load('quizScores', []));
   const [streakDays, setStreakDays] = useState(() => parseInt(localStorage.getItem('streakDays') || '0', 10));
@@ -122,16 +126,11 @@ export function AppProvider({ children }) {
   };
 
   const markKnown = (topicId, wordId, { silent = false } = {}) => {
-    const key = `${topicId}-${wordId}`;
+    const tKey = topicKey(lang, topicId);
     setKnownWords(prev => {
-      const list = prev[topicId] || [];
+      const list = prev[tKey] || [];
       if (list.includes(wordId)) return prev;
-      return { ...prev, [topicId]: [...list, wordId] };
-    });
-    setReviewItems(prev => {
-      const copy = { ...prev };
-      delete copy[key];
-      return copy;
+      return { ...prev, [tKey]: [...list, wordId] };
     });
     if (!silent) {
       setXp(x => x + 5);
@@ -141,19 +140,16 @@ export function AppProvider({ children }) {
   };
 
   const markUnknown = (topicId, wordId) => {
-    const key = `${topicId}-${wordId}`;
+    const key = wordKey(lang, topicId, wordId);
     setMistakes(prev => ({ ...prev, [key]: (prev[key] || 0) + 1 }));
-    setReviewItems(prev => {
-      const existing = prev[key];
-      const level = existing ? 0 : 0;
-      return { ...prev, [key]: { level, dueAt: Date.now() + REVIEW_INTERVALS[0] } };
-    });
+    setReviewItems(prev => ({ ...prev, [key]: { level: 0, dueAt: Date.now() + REVIEW_INTERVALS[0] } }));
   };
 
+  // Ôn tập đúng thẻ vừa trả lời: đã nhớ thì xoá khỏi hàng chờ và tăng XP,
+  // chưa nhớ thì đưa lại vào hàng chờ với khoảng cách ngắn nhất.
   const reviewCard = (topicId, wordId, known) => {
-    const key = `${topicId}-${wordId}`;
+    const key = wordKey(lang, topicId, wordId);
     if (known) {
-      markKnown(topicId, wordId, { silent: true });
       setXp(x => x + 3);
       bumpDaily();
       setReviewItems(prev => {
@@ -173,20 +169,25 @@ export function AppProvider({ children }) {
     }
   };
 
-  const isKnown = (topicId, wordId) => (knownWords[topicId] || []).includes(wordId);
-  const getTopicProgress = (topicId) => (knownWords[topicId] || []).length;
-  const getTotalKnown = () => Object.values(knownWords).reduce((a, b) => a + b.length, 0);
+  const isKnown = (topicId, wordId) => (knownWords[topicKey(lang, topicId)] || []).includes(wordId);
+  const getTopicProgress = (topicId) => (knownWords[topicKey(lang, topicId)] || []).length;
+  const getTotalKnown = () =>
+    Object.entries(knownWords)
+      .filter(([k]) => wordKeyLang(k) === lang || !k.includes(':'))
+      .reduce((a, [, v]) => a + v.length, 0);
 
+  // Chỉ lấy thẻ đến hạn của ngôn ngữ đang học.
   const getDueReviews = useCallback(
     () =>
       Object.entries(reviewItems)
-        .filter(([, v]) => v.dueAt <= Date.now())
+        .filter(([key, v]) => (wordKeyLang(key) || 'en') === lang && v.dueAt <= Date.now())
         .map(([key, v]) => ({ key, ...v })),
-    [reviewItems],
+    [reviewItems, lang],
   );
 
   const getReviewCount = () => getDueReviews().length;
-  const getTotalInReview = () => Object.keys(reviewItems).length;
+  const getTotalInReview = () =>
+    Object.keys(reviewItems).filter(k => (wordKeyLang(k) || 'en') === lang).length;
 
   const toggleStar = (wordKey) => {
     setStarredWords(prev => {
@@ -232,6 +233,7 @@ export function AppProvider({ children }) {
 
   const getTopMistakes = () =>
     Object.entries(mistakes)
+      .filter(([k]) => (wordKeyLang(k) || 'en') === lang)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 8)
       .map(([key, count]) => ({ key, count }));

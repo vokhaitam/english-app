@@ -1,10 +1,12 @@
 import React from 'react';
-import { topics, vocabulary } from '../data/vocabulary';
+import { useLanguage } from '../context/LanguageContext';
 
-export default function TopicSelector({ selectedTopic, onSelect, progress = {}, topics: topicList = topics }) {
+export default function TopicSelector({ selectedTopic, onSelect, progress = {}, topics: topicList }) {
+  const { topics, vocabulary } = useLanguage();
+  const list = topicList || topics;
   return (
     <div className="topic-grid">
-      {topicList.map(topic => {
+      {list.map(topic => {
         const done = progress[topic.id]?.known || 0;
         const total = vocabulary[topic.id]?.length || 0;
         const pct = total > 0 ? Math.round((done / total) * 100) : 0;

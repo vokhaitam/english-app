@@ -78,6 +78,14 @@ a:active, button:active {
   /* Font */
   --font-primary: 'Inter', sans-serif;
   --font-display: 'Outfit', sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-japanese: 'Noto Sans JP', 'Yu Gothic', 'Hiragino Sans', 'Meiryo', var(--font-body);
+
+  /* Trạng thái dùng chung cho phần trạng thái đúng/sai và nền phụ */
+  --accent-soft: rgba(232, 50, 111, 0.08);
+  --bg-subtle: rgba(214, 104, 148, 0.07);
+  --success: #1f9d61;
+  --danger: #df3b4f;
 
   /* Transitions */
   --transition-fast: 0.15s ease;
@@ -1826,6 +1834,11 @@ body::before {
   --gradient-hero: linear-gradient(135deg, #ff5c94 0%, #ff8fb0 55%, #ffa97a 100%);
   --gradient-card: linear-gradient(135deg, rgba(255,92,148,0.2), rgba(255,143,176,0.15));
 
+  --accent-soft: rgba(255, 109, 157, 0.12);
+  --bg-subtle: rgba(255,255,255,0.05);
+  --success: #4ade80;
+  --danger: #fb7185;
+
   --shadow-sm: 0 2px 8px rgba(0,0,0,0.35);
   --shadow-md: 0 4px 20px rgba(0,0,0,0.45);
   --shadow-lg: 0 8px 40px rgba(0,0,0,0.55);
@@ -2642,4 +2655,400 @@ body::before {
 .btn:active,
 .control-btn:active {
   transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================
+   KANA
+   ============================================ */
+.jp-cell {
+  font-family: var(--font-japanese);
+}
+
+.kana-tabs {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.kana-tab {
+  padding: 9px 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.kana-tab:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+.kana-tab.active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #fff;
+}
+
+.kana-hint {
+  margin-bottom: var(--space-md);
+  font-size: 0.88rem;
+}
+
+.kana-picked {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--accent-soft);
+  border: 1px solid var(--border-color);
+}
+
+.kana-picked-glyph {
+  font-family: var(--font-japanese);
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.kana-picked-romaji {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.kana-picked-hira {
+  font-family: var(--font-japanese);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.kana-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.kana-row-block {
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: var(--space-md);
+}
+
+.kana-row-block:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.kana-row-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: 8px;
+}
+
+.kana-row-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  min-width: 2.2rem;
+  text-transform: uppercase;
+}
+
+.kana-row-vowels {
+  display: flex;
+  gap: 14px;
+  font-family: var(--font-japanese);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.kana-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.kana-voiced-group,
+.kana-semi-group,
+.kana-extra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--border-color);
+}
+
+.kana-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 62px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.kana-cell:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+}
+
+.kana-cell.picked {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+.kana-cell.picked .kana-glyph,
+.kana-cell.picked .kana-romaji {
+  color: #fff;
+}
+
+.kana-glyph {
+  font-family: var(--font-japanese);
+  font-size: 1.6rem;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+
+.kana-romaji {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.kana-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.kana-legend strong {
+  font-family: var(--font-japanese);
+  color: var(--text-primary);
+}
+
+.kana-drill-score {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.kana-drill-card {
+  padding: var(--space-xl) var(--space-lg);
+  border-radius: var(--radius-xl);
+  background: var(--bg-subtle);
+  text-align: center;
+}
+
+.kana-drill-prompt {
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin-bottom: var(--space-lg);
+  letter-spacing: 0.02em;
+}
+
+.kana-drill-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  justify-content: center;
+}
+
+.kana-option {
+  font-family: var(--font-japanese);
+  font-size: 2rem;
+  min-width: 84px;
+  padding: 12px 18px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.kana-option:hover:not(:disabled) {
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+}
+
+.kana-option:disabled {
+  cursor: default;
+}
+
+.kana-option.right {
+  border-color: var(--success);
+  background: rgba(76,175,80,0.15);
+}
+
+.kana-option.wrong {
+  border-color: var(--danger);
+  background: rgba(244,67,54,0.15);
+}
+
+.kana-drill-feedback {
+  margin-top: var(--space-lg);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.kana-drill-feedback strong {
+  font-family: var(--font-japanese);
+  color: var(--text-primary);
+}
+
+.kana-drill-result {
+  text-align: center;
+  padding: var(--space-xl) 0;
+}
+
+.kana-reference {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.kana-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.kana-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  max-width: 280px;
+}
+
+.kana-chip strong {
+  font-family: var(--font-japanese);
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.kana-chip small {
+  font-size: 0.75rem;
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.kana-chip em {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: normal;
+  line-height: 1.4;
+}
+
+.kana-chip.small {
+  padding: 6px 12px;
+}
+
+.kana-chip.small strong {
+  font-size: 1rem;
+}
+
+.kana-table-data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.kana-table-data th,
+.kana-table-data td {
+  text-align: left;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: top;
+}
+
+.kana-table-data th {
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.kana-rules {
+  margin: var(--space-md) 0 0;
+  padding-left: 18px;
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kana-verb-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.kana-verb-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.kana-verb-group p {
+  margin: 0 0 10px;
+  font-size: 0.83rem;
+}
+
+@media (max-width: 640px) {
+  .kana-cell {
+    min-width: 52px;
+    padding: 6px 8px;
+  }
+
+  .kana-glyph {
+    font-size: 1.3rem;
+  }
+
+  .kana-drill-prompt {
+    font-size: 2rem;
+  }
+
+  .kana-option {
+    font-size: 1.5rem;
+    min-width: 66px;
+  }
+
+  .kana-table-data {
+    font-size: 0.78rem;
+  }
+
+  .kana-table-data th,
+  .kana-table-data td {
+    padding: 7px 6px;
+  }
 }

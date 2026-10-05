@@ -4,9 +4,11 @@ import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import InstallButton from './InstallButton';
 
+// japaneseOnly: mục chỉ có ý nghĩa với gói Nhật.
 const navItems = [
   { to: '/', icon: '🏠', label: 'Dashboard', short: 'Trang chủ' },
   { to: '/study', icon: '📚', label: 'Học từ vựng', short: 'Từ vựng' },
+  { to: '/kana', icon: '🔤', label: 'Bảng kana', short: 'Kana', japaneseOnly: true },
   { to: '/grammar', icon: '📘', label: 'Ngữ pháp', short: 'Ngữ pháp' },
   { to: '/grammar-practice', icon: '✍️', label: 'Luyện tập ngữ pháp', short: 'Luyện tập' },
   { to: '/review', icon: '🔁', label: 'Ôn tập', short: 'Ôn tập' },
@@ -23,6 +25,7 @@ export default function Sidebar() {
   const { getReviewCount, theme, toggleTheme, getLevel, xp } = useApp();
   const { lang, languages, selectLanguage, pack } = useLanguage();
   const dueCount = getReviewCount();
+  const visibleNavItems = navItems.filter(i => !i.japaneseOnly || lang === 'ja');
 
   return (
     <>
@@ -60,7 +63,7 @@ export default function Sidebar() {
         </div>
 
         <nav className="sidebar-nav">
-          {navItems.map(item => (
+          {visibleNavItems.map(item => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -114,7 +117,7 @@ export default function Sidebar() {
       {/* Mobile Nav */}
       <nav className="mobile-nav">
         <div className="mobile-nav-items">
-          {navItems.slice(0, 5).map(item => (
+          {visibleNavItems.slice(0, 5).map(item => (
             <NavLink
               key={item.to}
               to={item.to}

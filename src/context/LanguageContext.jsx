@@ -40,6 +40,8 @@ export function LanguageProvider({ children }) {
       grammarLessons: pack.grammarLessons,
       grammarPractice: pack.grammarPractice,
       dailySentences: pack.dailySentences,
+      // Chỉ gói Nhật có bảng kana; các gói khác trả null.
+      kana: pack.kana || null,
     };
   }, [lang, selectLanguage]);
 

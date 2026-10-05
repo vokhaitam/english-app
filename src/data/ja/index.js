@@ -1,11 +1,19 @@
 // Gói dữ liệu tiếng Nhật.
 // Giữ đúng interface của src/data/vocabulary.js để các trang không phải sửa logic.
 import * as greetings from './vocab/greetings';
+import * as numbersTime from './vocab/numbers-time';
+import * as dailyLife from './vocab/daily-life';
+import * as food from './vocab/food';
 import { grammarLessons as rawLessons } from './grammar';
 import { grammarReadings } from './grammarReadings';
 import { dailySentences } from './sentences';
+import {
+  kanaRows, kanaYoOn, kanaSpecial, kanaChart,
+  counters, numberWords, countingRules, verbClasses,
+} from './kana';
 
-const topicModules = [greetings];
+// Thứ tự học: chào hỏi -> số và thời gian -> cuộc sống hằng ngày -> ăn uống.
+const topicModules = [greetings, numbersTime, dailyLife, food];
 
 // Trang hiện tại dùng topic.name để hiển thị, nên đặt tên tiếng Việt vào name
 // còn kanji/kana đặt vào kana để dùng khi cần.
@@ -96,6 +104,18 @@ export default {
   grammarLessons,
   grammarPractice,
   dailySentences,
+
+  // Bảng kana: dữ liệu đã có sẵn, giờ trả ra cho KanaPage dùng.
+  kana: {
+    rows: kanaRows,
+    chart: kanaChart,
+    yoon: kanaYoOn,
+    special: kanaSpecial,
+    counters,
+    numberWords,
+    countingRules,
+    verbClasses,
+  },
 
   unitWord: 'từ vựng',
   unitTopic: 'chủ đề',

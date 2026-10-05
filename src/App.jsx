@@ -11,6 +11,7 @@ const GrammarPage = lazy(() => import('./pages/GrammarPage'));
 const GrammarPracticePage = lazy(() => import('./pages/GrammarPracticePage'));
 const ReviewPage = lazy(() => import('./pages/ReviewPage'));
 const ListeningPage = lazy(() => import('./pages/ListeningPage'));
+const KanaPage = lazy(() => import('./pages/KanaPage'));
 const DailySentencePage = lazy(() => import('./pages/DailySentencePage'));
 const QuizPage = lazy(() => import('./pages/QuizPage'));
 const WordRainPage = lazy(() => import('./pages/WordRainPage'));
@@ -46,6 +47,7 @@ function App() {
                   <Route path="/study" element={<StudyPage />} />
                   <Route path="/grammar" element={<GrammarPage />} />
                   <Route path="/grammar-practice" element={<GrammarPracticePage />} />
+                  <Route path="/kana" element={<KanaPage />} />
                   <Route path="/review" element={<ReviewPage />} />
                   <Route path="/listening" element={<ListeningPage />} />
                   <Route path="/daily-sentence" element={<DailySentencePage />} />

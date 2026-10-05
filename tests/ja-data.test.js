@@ -1,9 +1,21 @@
 import { describe, it, expect } from 'vitest';
 import { romajiMatchesReading, kanaToRomaji } from '../src/lib/kanaTranslit';
 import { topic, words } from '../src/data/ja/vocab/greetings';
+import * as numbersTime from '../src/data/ja/vocab/numbers-time';
+import * as dailyLife from '../src/data/ja/vocab/daily-life';
+import * as food from '../src/data/ja/vocab/food';
 import { kanaChart, kanaRows, counters, numberWords } from '../src/data/ja/kana';
+import { checkTopic } from './helpers/checkTopic';
 
 const JAPANESE = /[\u3040-\u30ff\u4e00-\u9fff]/;
+
+// Mọi topic tiếng Nhật phải qua cùng một bộ quy tắc.
+const jaTopics = [
+  ['ja-greetings', { topic, words }],
+  ['ja-numbers-time', numbersTime],
+  ['ja-daily-life', dailyLife],
+  ['ja-food', food],
+];
 
 /**
  * Dữ liệu tiếng Nhật phải sạch tuyệt đối: người học không tự phát hiện được
@@ -106,6 +118,35 @@ describe('greetings topic', () => {
       const blob = `${w.word} ${w.reading} ${w.example} ${w.meaning} ${w.exampleMeaning}`;
       expect(blob, `id ${w.id}`).not.toMatch(/Attachment|ANALYZER|HOMECOMING|AUTOSOM|Geraldo|GRAMMAR_HINT|INTRODUCTION|MAYBE|Recommendation/i);
     }
+  });
+});
+
+describe('mọi topic tiếng Nhật', () => {
+  it.each(jaTopics)('%s đạt chuẩn dữ liệu', async (id, mod) => {
+    expect(await checkTopic(mod, id)).toEqual([]);
+  });
+
+  it('gói Nhật đăng ký đủ topic và tổng số từ', async () => {
+    const ja = (await import('../src/data/ja')).default;
+    expect(ja.topics.map(t => t.id)).toEqual(jaTopics.map(([id]) => id));
+    expect(ja.topics.every(t => t.name && t.kana && t.icon && t.level)).toBe(true);
+    const total = Object.values(ja.vocabulary).reduce((a, b) => a + b.length, 0);
+    expect(total).toBe(jaTopics.reduce((a, [, m]) => a + m.words.length, 0));
+    expect(total).toBeGreaterThanOrEqual(200);
+    // getAllWords phải gắn topicId để tiến trình tách theo chủ đề.
+    expect(ja.getAllWords().every(w => w.topicId)).toBe(true);
+  });
+
+  it('bảng kana được expose qua pack cho KanaPage', async () => {
+    const ja = (await import('../src/data/ja')).default;
+    expect(ja.kana.rows).toBe(kanaRows);
+    expect(ja.kana.chart).toBe(kanaChart);
+    expect(ja.kana.yoon.length).toBeGreaterThan(0);
+    expect(ja.kana.special.length).toBeGreaterThan(0);
+    expect(ja.kana.counters.length).toBeGreaterThan(0);
+    expect(ja.kana.numberWords.length).toBeGreaterThan(0);
+    expect(ja.kana.countingRules.length).toBeGreaterThan(0);
+    expect(Object.keys(ja.kana.verbClasses)).toEqual(['ichidan', 'godan', 'irregular']);
   });
 });
 

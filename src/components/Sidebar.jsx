@@ -131,13 +131,13 @@ export default function Sidebar() {
         </nav>
 
         <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div className="card sidebar-level-card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ fontSize: '1.4rem' }}>🏅</div>
-            <div style={{ flex: 1 }} className="sidebar-level-info">
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: '700', fontSize: '0.9rem' }}>
-                Cấp {getLevel()}
+          <div className="card sidebar-level-card" style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ fontSize: '1.2rem', flexShrink: 0 }}>🏅</div>
+            <div style={{ flex: 1, minWidth: 0 }} className="sidebar-level-info">
+              <div style={{ fontFamily: 'var(--font-display)', fontWeight: '700', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                Cấp {getLevel()} <span style={{ color: 'var(--text-muted)', fontWeight: '500', fontSize: '0.75rem' }}>· {xp} XP</span>
               </div>
-              <div className="progress-bar-container" style={{ height: '5px', marginTop: '6px' }}>
+              <div className="progress-bar-container" style={{ height: '4px', marginTop: '5px' }}>
                 <div className="progress-bar-fill" style={{ width: `${xp % 100}%` }} />
               </div>
             </div>

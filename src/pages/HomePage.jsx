@@ -105,7 +105,7 @@ function HeroVisualCard({ totalKnown, streakDays, goalPct, avgScore, getLevel, x
   return (
     <div className="hp-hero-visual">
       <div className="hp-hero-visual-glow" aria-hidden="true" />
-      {/* Card nổi */}
+      {/* Card nổi - 4 góc */}
       <div className="hp-float-card hp-float-card-main">
         <div className="hp-float-card-icon">📚</div>
         <div>
@@ -124,10 +124,17 @@ function HeroVisualCard({ totalKnown, streakDays, goalPct, avgScore, getLevel, x
         <div className="hp-float-card-icon">🎯</div>
         <div>
           <div className="hp-float-card-value">{avgScore}%</div>
-          <div className="hp-float-card-label">Điểm Quiz TB</div>
+          <div className="hp-float-card-label">Quiz TB</div>
         </div>
       </div>
-      {/* Progress ring */}
+      <div className="hp-float-card hp-float-card-level">
+        <div className="hp-float-card-icon">🚀</div>
+        <div>
+          <div className="hp-float-card-value">Cấp {getLevel()}</div>
+          <div className="hp-float-card-label" style={{ color: 'rgba(255,255,255,0.85)' }}>{xp} XP</div>
+        </div>
+      </div>
+      {/* Progress ring - ở giữa */}
       <div className="hp-hero-ring">
         <svg viewBox="0 0 100 100" className="hp-ring-svg">
           <circle cx="50" cy="50" r="42" className="hp-ring-track" />
@@ -142,11 +149,6 @@ function HeroVisualCard({ totalKnown, streakDays, goalPct, avgScore, getLevel, x
           <div className="hp-ring-pct">{goalPct}%</div>
           <div className="hp-ring-label">Mục tiêu</div>
         </div>
-      </div>
-      {/* Level badge */}
-      <div className="hp-hero-level-badge">
-        <span className="hp-level-icon">🚀</span>
-        <span>Cấp {getLevel()} · {xp} XP</span>
       </div>
     </div>
   );

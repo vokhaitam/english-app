@@ -27,34 +27,39 @@ a:active, button:active {
 }
 
 :root {
-  /* Colors */
-  --track-color: rgba(82,35,56,0.1);
-  --bg-primary: #fff3f6;
-  --bg-secondary: #ffe4eb;
-  --bg-card: rgba(255,255,255,0.85);
-  --bg-card-hover: rgba(255,255,255,0.95);
-  --border-color: rgba(214,104,148,0.18);
-  --border-hover: rgba(214,104,148,0.4);
+  /* Colors - Warm gradient theme (cam/hồng/vàng) */
+  --track-color: rgba(180,90,40,0.1);
+  --bg-primary: #fff8f0;
+  --bg-secondary: #ffeede;
+  --bg-card: rgba(255,255,255,0.88);
+  --bg-card-hover: rgba(255,255,255,0.96);
+  --border-color: rgba(214,134,80,0.2);
+  --border-hover: rgba(214,134,80,0.45);
 
   /* Text */
-  --text-primary: #522338;
-  --text-secondary: #94687c;
-  --text-muted: #b792a2;
+  --text-primary: #4a2818;
+  --text-secondary: #8a5d44;
+  --text-muted: #b89a82;
 
-  /* Accent */
-  --accent-primary: #e8326f;
-  --accent-secondary: #ff7ea6;
-  --accent-deep-red: #c0154a;
-  --accent-crimson: #a01040;
+  /* Accent - cam/hồng/vàng */
+  --accent-primary: #e84e2c;
+  --accent-secondary: #ff8a5b;
+  --accent-pink: #ff5c8a;
+  --accent-gold: #ffb547;
+  --accent-yellow: #ffc857;
+  --accent-coral: #ff7a6c;
+  --accent-deep: #c0154a;
   --accent-green: #1f9d61;
-  --accent-yellow: #c46a0e;
   --accent-red: #df3b4f;
   --accent-cyan: #0e94b5;
 
-  /* Gradients */
-  --gradient-hero: linear-gradient(135deg, #c0154a 0%, #e8326f 50%, #ff7ea6 100%);
-  --gradient-card: linear-gradient(135deg, rgba(192,21,74,0.12), rgba(232,50,111,0.1), rgba(255,126,166,0.1));
-  --gradient-red-accent: linear-gradient(135deg, #c0154a 0%, #e8326f 100%);
+  /* Gradients - ấm áp cam/hồng/vàng */
+  --gradient-hero: linear-gradient(135deg, #ffb547 0%, #ff7a6c 35%, #ff5c8a 70%, #e84e2c 100%);
+  --gradient-warm: linear-gradient(135deg, #ffb547, #ff7a6c, #ff5c8a);
+  --gradient-sunset: linear-gradient(180deg, #ffb547 0%, #ff7a6c 50%, #ff5c8a 100%);
+  --gradient-card: linear-gradient(135deg, rgba(255,181,71,0.15), rgba(255,122,108,0.12), rgba(255,92,138,0.12));
+  --gradient-red-accent: linear-gradient(135deg, #ff7a6c 0%, #e84e2c 100%);
+  --gradient-gold: linear-gradient(135deg, #ffb547, #ff8a5b);
 
   /* Spacing */
   --space-xs: 4px;
@@ -65,19 +70,21 @@ a:active, button:active {
   --space-2xl: 48px;
   --space-3xl: 64px;
 
-  /* Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  /* Radius - bo tròn nhiều hơn cho mềm mại */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
   --radius-full: 9999px;
 
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(180,80,120,0.14);
-  --shadow-md: 0 4px 20px rgba(180,80,120,0.18);
-  --shadow-lg: 0 8px 40px rgba(180,80,120,0.22);
-  --shadow-glow: 0 0 30px rgba(232,50,111,0.28);
-  --shadow-red-glow: 0 0 30px rgba(192,21,74,0.35);
+  /* Shadows - ấm hơn với tông cam/hồng */
+  --shadow-sm: 0 2px 10px rgba(214,134,80,0.15);
+  --shadow-md: 0 6px 24px rgba(214,134,80,0.2);
+  --shadow-lg: 0 12px 48px rgba(214,134,80,0.25);
+  --shadow-glow: 0 0 30px rgba(255,122,108,0.35);
+  --shadow-warm: 0 8px 32px rgba(255,181,71,0.3);
+  --shadow-red-glow: 0 0 30px rgba(232,78,44,0.4);
 
   /* Font */
   --font-primary: 'Inter', sans-serif;
@@ -85,16 +92,16 @@ a:active, button:active {
   --font-body: 'Inter', system-ui, sans-serif;
   --font-japanese: 'Noto Sans JP', 'Yu Gothic', 'Hiragino Sans', 'Meiryo', var(--font-body);
 
-  /* Trạng thái dùng chung cho phần trạng thái đúng/sai và nền phụ */
-  --accent-soft: rgba(232, 50, 111, 0.08);
-  --bg-subtle: rgba(214, 104, 148, 0.07);
+  /* Trạng thái dùng chung */
+  --accent-soft: rgba(232, 78, 44, 0.1);
+  --bg-subtle: rgba(214, 134, 80, 0.08);
   --success: #1f9d61;
   --danger: #df3b4f;
 
-  /* Transitions */
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.25s ease;
-  --transition-slow: 0.4s ease;
+  /* Transitions - mượt mà hơn */
+  --transition-fast: 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-normal: 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-slow: 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 html {
@@ -498,15 +505,15 @@ body::before {
   left: 0;
   right: 0;
   width: 100%;
-  /* Hồng nhạt hơn - dễ chịu */
-  background: linear-gradient(180deg, rgba(255, 158, 192, 0.98), rgba(255, 109, 157, 0.98));
+  /* Hồng nhạt hơn - dễ chịu, ấm áp */
+  background: linear-gradient(180deg, rgba(255, 181, 71, 0.98), rgba(255, 122, 108, 0.98));
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 0;
   padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
   z-index: 100;
   box-shadow:
-    0 -8px 24px rgba(255, 109, 157, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    0 -8px 24px rgba(255, 122, 108, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
@@ -2006,47 +2013,51 @@ body::before {
    ============================================ */
 [data-theme="dark"] {
   --track-color: rgba(255,255,255,0.1);
-  --bg-primary: #14091a;
-  --bg-secondary: #1e1126;
+  --bg-primary: #1a0f0a;
+  --bg-secondary: #251712;
   --bg-card: rgba(255,255,255,0.05);
   --bg-card-hover: rgba(255,255,255,0.09);
-  --border-color: rgba(255,255,255,0.09);
-  --border-hover: rgba(255,255,255,0.2);
+  --border-color: rgba(255,255,255,0.1);
+  --border-hover: rgba(255,255,255,0.22);
 
-  --text-primary: #f5e9ef;
-  --text-secondary: #c4a8b8;
-  --text-muted: #8a7080;
+  --text-primary: #fff5ec;
+  --text-secondary: #e8c8a8;
+  --text-muted: #a88a72;
 
-  --accent-primary: #ff6d9d;
-  --accent-secondary: #ff9ec0;
-  --accent-deep-red: #ff4d85;
-  --accent-crimson: #e8326f;
+  --accent-primary: #ff8a5b;
+  --accent-secondary: #ffb547;
+  --accent-deep-red: #e84e2c;
+  --accent-pink: #ff5c8a;
+  --accent-gold: #ffb547;
+  --accent-coral: #ff7a6c;
+  --accent-crimson: #e84e2c;
   --accent-green: #4ade80;
-  --accent-yellow: #fbbf24;
+  --accent-yellow: #fcd34d;
   --accent-red: #fb7185;
   --accent-cyan: #38c6e8;
 
-  --gradient-hero: linear-gradient(135deg, #e8326f 0%, #ff6d9d 50%, #ff9ec0 100%);
-  --gradient-card: linear-gradient(135deg, rgba(232,50,111,0.18), rgba(255,109,157,0.14), rgba(255,158,192,0.12));
-  --gradient-red-accent: linear-gradient(135deg, #e8326f 0%, #ff6d9d 100%);
+  --gradient-hero: linear-gradient(135deg, #ffb547 0%, #ff7a6c 35%, #ff5c8a 70%, #e84e2c 100%);
+  --gradient-card: linear-gradient(135deg, rgba(255,181,71,0.18), rgba(255,122,108,0.14), rgba(255,92,138,0.12));
+  --gradient-red-accent: linear-gradient(135deg, #ff7a6c 0%, #e84e2c 100%);
 
-  --accent-soft: rgba(255, 109, 157, 0.12);
+  --accent-soft: rgba(255, 138, 91, 0.12);
   --bg-subtle: rgba(255,255,255,0.05);
   --success: #4ade80;
   --danger: #fb7185;
 
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.35);
-  --shadow-md: 0 4px 20px rgba(0,0,0,0.45);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,0.55);
-  --shadow-glow: 0 0 30px rgba(255,109,157,0.4);
-  --shadow-red-glow: 0 0 30px rgba(232,50,111,0.5);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-md: 0 6px 24px rgba(0,0,0,0.5);
+  --shadow-lg: 0 12px 48px rgba(0,0,0,0.6);
+  --shadow-glow: 0 0 30px rgba(255,138,91,0.45);
+  --shadow-warm: 0 8px 32px rgba(255,181,71,0.35);
+  --shadow-red-glow: 0 0 30px rgba(232,78,44,0.5);
 }
 
 [data-theme="dark"] body::before {
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(232,50,111,0.18) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(255,109,157,0.14) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(255,158,192,0.1) 0%, transparent 60%);
+    radial-gradient(ellipse at 20% 20%, rgba(255,181,71,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(255,122,108,0.14) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(255,92,138,0.1) 0%, transparent 60%);
 }
 
 [data-theme="dark"] .progress-bar-container { background: rgba(255,255,255,0.07); }
@@ -2054,30 +2065,30 @@ body::before {
 [data-theme="dark"] .card-hint { background: rgba(255,255,255,0.08); color: var(--text-muted); }
 
 [data-theme="dark"] .flashcard-front {
-  background: linear-gradient(135deg, #2a1a30 0%, #331c3c 50%, #3a1f45 100%);
+  background: linear-gradient(135deg, #2a1810 0%, #331c12 50%, #3a1f10 100%);
 }
 
 [data-theme="dark"] .flashcard-back {
-  background: linear-gradient(135deg, #2c1030 0%, #4a1d3e 60%, #5a1f46 100%);
+  background: linear-gradient(135deg, #2c1812 0%, #4a2818 60%, #5a2814 100%);
 }
 
 [data-theme="dark"] .flashcard-face .card-word {
-  background: linear-gradient(135deg, #ff8fb0, #ffb07a);
+  background: linear-gradient(135deg, #ffb547, #ff7a6c);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 [data-theme="dark"] .grammar-formula {
-  background: rgba(255,92,148,0.1);
-  border-color: rgba(255,92,148,0.3);
+  background: rgba(255,181,71,0.1);
+  border-color: rgba(255,181,71,0.3);
 }
 
 [data-theme="dark"] .grammar-example { background: rgba(255,255,255,0.04); }
 
 [data-theme="dark"] .achievement-item.done {
-  border-color: rgba(255,92,148,0.45);
-  background: linear-gradient(135deg, rgba(255,92,148,0.16), rgba(255,169,122,0.12));
+  border-color: rgba(255,138,91,0.5);
+  background: linear-gradient(135deg, rgba(255,181,71,0.18), rgba(255,122,108,0.15));
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
@@ -3569,8 +3580,8 @@ a:hover .game-card {
 }
 
 [data-theme="dark"] .heat-cell { background: rgba(255, 255, 255, 0.08); }
-[data-theme="dark"] .heat-cell.level-1 { background: rgba(255, 92, 148, 0.3); }
-[data-theme="dark"] .heat-cell.level-2 { background: rgba(255, 92, 148, 0.62); }
+[data-theme="dark"] .heat-cell.level-1 { background: rgba(255, 181, 71, 0.3); }
+[data-theme="dark"] .heat-cell.level-2 { background: rgba(255, 122, 108, 0.62); }
 [data-theme="dark"] .heat-cell.level-3 { background: var(--accent-primary); }
 
 /* --- Game: Ghep the --- */

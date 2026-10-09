@@ -5,6 +5,8 @@ services:
     buildCommand: npm run build
     staticPublishPath: ./dist
     routes:
+      # SPA fallback - rewrite all non-file requests to index.html
+      # Render static sites automatically serve existing files first
       - type: rewrite
         source: /*
         destination: /index.html

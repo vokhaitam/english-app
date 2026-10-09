@@ -212,20 +212,26 @@ export default function HomePage() {
         <div className="hp-hero-text">
           {streakDays > 0 && (
             <div className="hp-hero-streak-pill">
-              <span className="flame-flicker" style={{ fontSize: '1rem' }}>🔥</span>
-              {streakDays} ngày streak — tiếp tục nào!
+              <span className="flame-flicker" style={{ fontSize: '0.95rem' }}>🔥</span>
+              {streakDays} ngày streak
             </div>
           )}
+
+          <div className="hp-hero-eyebrow">
+            <span className="hp-hero-eyebrow-dot" />
+            {isJapanese ? 'Nền tảng học tiếng Nhật' : 'Nền tảng học từ vựng'}
+          </div>
+
           <h1 className="hp-hero-title">
-            Học từ vựng<br />
-            <span className="hp-hero-title-accent">thông minh hơn</span><br />
+            Học từ vựng
+            <span className="hp-hero-title-accent">thông minh hơn</span>
             mỗi ngày
           </h1>
+
           <p className="hp-hero-desc">
-            Flashcard + Spaced Repetition giúp bạn ghi nhớ lâu hơn gấp&nbsp;3 lần.
-            Lộ trình TOEIC · IELTS rõ ràng, 6 game luyện tập vui nhộn.
+            Flashcard + Spaced Repetition giúp nhớ lâu <strong>gấp 3 lần</strong>.
+            Lộ trình TOEIC · IELTS rõ ràng, 6 game vui nhộn.
           </p>
-          <div className="hp-hero-date">{todayLabel}</div>
 
           {/* CTA buttons */}
           <div className="hp-hero-ctas">
@@ -243,12 +249,12 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Badge row */}
-          <div className="hp-hero-badges">
+          {/* Date + Badge row - cùng 1 dòng */}
+          <div className="hp-hero-meta">
+            <span className="hp-hero-date">📅 {todayLabel}</span>
             <span className="hp-hero-badge">🏅 Cấp {getLevel()}</span>
-            <span className="hp-hero-badge">📖 {totalKnown} từ đã học</span>
-            <span className="hp-hero-badge">🎯 {goalPct}% mục tiêu hôm nay</span>
-            <span className="hp-hero-badge">⭐ {totalStarred} từ đã đánh dấu</span>
+            <span className="hp-hero-badge">📖 {totalKnown} từ</span>
+            <span className="hp-hero-badge">⭐ {totalStarred} đã đánh dấu</span>
           </div>
         </div>
 

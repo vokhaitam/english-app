@@ -4321,54 +4321,79 @@ body.sidebar-collapsed .main-content { margin-left: 78px; }
   animation: floatY 10s ease-in-out infinite 3s;
 }
 
-/* ── Hero Text (LUNG LINH) ── */
+/* ── Hero Text (GỌN GÀNG & CÂN ĐỐI) ── */
 .hp-hero-text {
   position: relative;
   z-index: 1;
+  max-width: 540px;
 }
 
+/* Streak pill - gọn & đẹp */
 .hp-hero-streak-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
+  gap: 6px;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
   background: linear-gradient(135deg, #fff5e6, #ffe4ec);
-  border: 1.5px solid rgba(232, 50, 111, 0.35);
-  font-size: 0.85rem;
-  font-weight: 800;
+  border: 1px solid rgba(232, 50, 111, 0.3);
+  font-size: 0.78rem;
+  font-weight: 700;
   color: var(--accent-primary);
-  margin-bottom: 20px;
-  box-shadow: 0 4px 14px rgba(232, 50, 111, 0.2);
-  animation: cardEntrance 0.5s ease both, streakPulse 2.5s ease-in-out infinite 1s;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 10px rgba(232, 50, 111, 0.15);
+  animation: cardEntrance 0.5s ease both;
 }
 
-@keyframes streakPulse {
-  0%, 100% { box-shadow: 0 4px 14px rgba(232, 50, 111, 0.2); }
-  50% { box-shadow: 0 6px 24px rgba(255, 122, 108, 0.4); }
+/* Eyebrow - label nhỏ trên tiêu đề */
+.hp-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-primary);
+  margin-bottom: 10px;
+  animation: cardEntrance 0.5s ease 0.05s both;
 }
 
+.hp-hero-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 0 0 4px rgba(232, 50, 111, 0.15);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(232, 50, 111, 0.15); }
+  50% { box-shadow: 0 0 0 8px rgba(232, 50, 111, 0); }
+}
+
+/* Title - cân đối, không quá to */
 .hp-hero-title {
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
   color: var(--text-primary);
-  margin: 0 0 18px;
-  animation: cardEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both;
+  margin: 0 0 12px;
+  animation: cardEntrance 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s both;
 }
 
 .hp-hero-title-accent {
-  background: linear-gradient(135deg, #ffb547 0%, #ff7a6c 30%, #ff5c8a 60%, #e84e2c 100%);
+  display: block;
+  background: linear-gradient(135deg, #ffb547 0%, #ff7a6c 35%, #ff5c8a 70%, #e84e2c 100%);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 4px 20px rgba(232, 78, 44, 0.25);
   animation: gradientShift 6s ease-in-out infinite;
-  display: inline-block;
-  filter: drop-shadow(0 2px 4px rgba(232, 78, 44, 0.15));
+  filter: drop-shadow(0 1px 2px rgba(232, 78, 44, 0.18));
 }
 
 @keyframes gradientShift {
@@ -4376,112 +4401,119 @@ body.sidebar-collapsed .main-content { margin-left: 78px; }
   50% { background-position: 100% 50%; }
 }
 
+/* Desc - gọn */
 .hp-hero-desc {
-  font-size: 1.08rem;
-  line-height: 1.75;
+  font-size: 0.95rem;
+  line-height: 1.65;
   color: var(--text-secondary);
-  margin-bottom: 12px;
-  max-width: 500px;
+  margin: 0 0 16px;
   font-weight: 500;
-  animation: cardEntrance 0.6s ease 0.1s both;
+  max-width: 480px;
+  animation: cardEntrance 0.55s ease 0.12s both;
 }
 
-.hp-hero-date {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-bottom: 28px;
-  padding: 4px 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-full);
-  animation: cardEntrance 0.6s ease 0.12s both;
+.hp-hero-desc strong {
+  color: var(--accent-primary);
+  font-weight: 700;
 }
 
+/* CTA buttons */
 .hp-hero-ctas {
   display: flex;
-  gap: 14px;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 24px;
-  animation: cardEntrance 0.6s ease 0.15s both;
+  margin-bottom: 16px;
+  animation: cardEntrance 0.55s ease 0.16s both;
 }
 
 .hp-cta-primary {
-  position: relative;
-  font-size: 1rem !important;
-  padding: 14px 26px !important;
+  font-size: 0.95rem !important;
+  padding: 11px 22px !important;
   font-weight: 800 !important;
-  border-radius: var(--radius-lg) !important;
+  border-radius: var(--radius-md) !important;
   background: linear-gradient(135deg, #ff7a6c 0%, #ff5c8a 50%, #e84e2c 100%) !important;
   background-size: 200% 200% !important;
   box-shadow:
-    0 8px 24px rgba(232, 78, 44, 0.4),
+    0 6px 18px rgba(232, 78, 44, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
   animation: gradientShift 4s ease-in-out infinite;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease !important;
 }
 
 .hp-cta-primary:hover {
-  transform: translateY(-3px) scale(1.03) !important;
+  transform: translateY(-2px) scale(1.02) !important;
   box-shadow:
-    0 12px 32px rgba(232, 78, 44, 0.5),
+    0 10px 26px rgba(232, 78, 44, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
 .hp-cta-primary:active {
-  transform: translateY(-1px) scale(0.99) !important;
+  transform: translateY(0) scale(0.99) !important;
 }
 
 .hp-cta-secondary {
-  font-size: 1rem !important;
-  padding: 14px 26px !important;
+  font-size: 0.95rem !important;
+  padding: 11px 22px !important;
   font-weight: 700 !important;
-  border-radius: var(--radius-lg) !important;
+  border-radius: var(--radius-md) !important;
   background: var(--bg-card) !important;
   border: 1.5px solid rgba(232, 50, 111, 0.25) !important;
   color: var(--text-primary) !important;
-  box-shadow: 0 4px 12px rgba(232, 50, 111, 0.1) !important;
+  box-shadow: 0 3px 10px rgba(232, 50, 111, 0.08) !important;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 .hp-cta-secondary:hover {
-  transform: translateY(-3px) scale(1.02) !important;
+  transform: translateY(-2px) scale(1.02) !important;
   border-color: var(--accent-primary) !important;
-  box-shadow: 0 8px 20px rgba(232, 50, 111, 0.2) !important;
+  box-shadow: 0 6px 16px rgba(232, 50, 111, 0.18) !important;
 }
 
 .hp-cta-secondary:active {
-  transform: translateY(-1px) scale(0.99) !important;
+  transform: translateY(0) scale(0.99) !important;
 }
 
-.hp-hero-badges {
+/* Meta row - date + badges gộp lại 1 dòng */
+.hp-hero-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  animation: cardEntrance 0.6s ease 0.2s both;
+  align-items: center;
+  gap: 8px;
+  animation: cardEntrance 0.55s ease 0.2s both;
+}
+
+.hp-hero-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
 }
 
 .hp-hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 7px 14px;
+  gap: 4px;
+  padding: 5px 12px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 245, 230, 0.7));
-  border: 1.5px solid rgba(232, 50, 111, 0.2);
-  font-size: 0.8rem;
-  font-weight: 700;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(255, 245, 230, 0.65));
+  border: 1px solid rgba(232, 50, 111, 0.2);
+  font-size: 0.78rem;
+  font-weight: 600;
   color: var(--text-secondary);
   backdrop-filter: blur(6px);
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .hp-hero-badge:hover {
-  transform: translateY(-3px) scale(1.05);
+  transform: translateY(-2px) scale(1.04);
   border-color: var(--accent-primary);
-  box-shadow: 0 6px 16px rgba(232, 50, 111, 0.2);
+  box-shadow: 0 4px 12px rgba(232, 50, 111, 0.18);
 }
 
 /* ── Hero Visual (right col) ── */

@@ -23,7 +23,6 @@ const MemoryMatchPage = lazy(() => import('./pages/MemoryMatchPage'));
 const WordScramblePage = lazy(() => import('./pages/WordScramblePage'));
 const ListeningChallengePage = lazy(() => import('./pages/ListeningChallengePage'));
 const SentenceBuilderPage = lazy(() => import('./pages/SentenceBuilderPage'));
-const IPhoneInstallPage = lazy(() => import('./pages/IPhoneInstallPage'));
 
 function PageLoader() {
   return (
@@ -84,7 +83,6 @@ function App() {
                   <Route path="/games/word-scramble" element={<WordScramblePage />} />
                   <Route path="/games/listening-challenge" element={<ListeningChallengePage />} />
                   <Route path="/games/sentence-builder" element={<SentenceBuilderPage />} />
-                  <Route path="/cai-app-iphone" element={<IPhoneInstallPage />} />
                 </Routes>
               </Suspense>
             </main>

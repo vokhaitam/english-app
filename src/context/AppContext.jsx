@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { todayKey, getWeekHistory as getWeekHistoryData } from '../lib/dateHelpers';
 import { wordKey, topicKey, wordKeyLang, migrateLegacyObject } from '../lib/wordKey';
+import { parseDeckItem } from '../lib/deckBuilder';
 import { useLanguage } from './LanguageContext';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
@@ -36,6 +37,18 @@ export function AppProvider({ children }) {
   const [dailyProgress, setDailyProgress] = useState(() => load('dailyProgress', {}));
   const [xp, setXp] = useState(() => parseInt(localStorage.getItem('xp') || '0', 10));
   const [sentencesLearned, setSentencesLearned] = useState(() => load('sentencesLearned', {}));
+  const [customDecks, setCustomDecks] = useState(() => load('customDecks', {}));
+
+  // Popup "+XP" bay ra khi nhận điểm (giống toast thưởng của luyentu.com).
+  const [xpToasts, setXpToasts] = useState([]);
+  const toastIdRef = useRef(0);
+  const showXpToast = (amount) => {
+    if (!amount || amount < 1) return;
+    toastIdRef.current += 1;
+    const id = toastIdRef.current;
+    setXpToasts(prev => [...prev.slice(-2), { id, amount }]);
+    setTimeout(() => setXpToasts(prev => prev.filter(t => t.id !== id)), 2200);
+  };
 
   const loadedRef = useRef(false);
   const settersRef = useRef({
@@ -43,7 +56,7 @@ export function AppProvider({ children }) {
     reviewItems: setReviewItems, mistakes: setMistakes, studyHistory: setStudyHistory,
     quizScores: setQuizScores, streakDays: setStreakDays, lastStudyDate: setLastStudyDate,
     dailyGoal: setDailyGoal, dailyProgress: setDailyProgress, xp: setXp,
-    sentencesLearned: setSentencesLearned,
+    sentencesLearned: setSentencesLearned, customDecks: setCustomDecks,
   });
 
   // snapshot helper
@@ -54,8 +67,9 @@ export function AppProvider({ children }) {
     s.quizScores = quizScores; s.streakDays = streakDays; s.lastStudyDate = lastStudyDate;
     s.dailyGoal = dailyGoal; s.dailyProgress = dailyProgress; s.xp = xp;
     s.sentencesLearned = sentencesLearned;
+    s.customDecks = customDecks;
     return s;
-  }, [theme, knownWords, starredWords, reviewItems, mistakes, studyHistory, quizScores, streakDays, lastStudyDate, dailyGoal, dailyProgress, xp, sentencesLearned]);
+  }, [theme, knownWords, starredWords, reviewItems, mistakes, studyHistory, quizScores, streakDays, lastStudyDate, dailyGoal, dailyProgress, xp, sentencesLearned, customDecks]);
 
   // load from API on mount
   useEffect(() => {
@@ -90,6 +104,7 @@ export function AppProvider({ children }) {
   useEffect(() => { localStorage.setItem('dailyProgress', JSON.stringify(dailyProgress)); }, [dailyProgress]);
   useEffect(() => { localStorage.setItem('xp', String(xp)); }, [xp]);
   useEffect(() => { localStorage.setItem('sentencesLearned', JSON.stringify(sentencesLearned)); }, [sentencesLearned]);
+  useEffect(() => { localStorage.setItem('customDecks', JSON.stringify(customDecks)); }, [customDecks]);
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
@@ -134,6 +149,7 @@ export function AppProvider({ children }) {
     });
     if (!silent) {
       setXp(x => x + 5);
+      showXpToast(5);
       bumpDaily();
       updateStreak();
     }
@@ -151,7 +167,9 @@ export function AppProvider({ children }) {
     const key = wordKey(lang, topicId, wordId);
     if (known) {
       setXp(x => x + 3);
+      showXpToast(3);
       bumpDaily();
+      updateStreak();
       setReviewItems(prev => {
         const existing = prev[key];
         if (!existing) return prev;
@@ -206,6 +224,7 @@ export function AppProvider({ children }) {
       ...prev.slice(0, 49),
     ]);
     setXp(x => x + score * 2);
+    showXpToast(score * 2);
     updateStreak();
     bumpDaily();
   };
@@ -247,12 +266,40 @@ export function AppProvider({ children }) {
     });
   };
 
+  // ---- Bộ từ vựng cá nhân ----
+  const createDeck = ({ name, icon = '🗂️', lang: deckLang, items = [], themeId = null }) => {
+    const id = `deck-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+    const deck = { id, name: name.trim() || 'Bộ từ mới', icon, lang: deckLang, items, themeId, createdAt: new Date().toISOString() };
+    setCustomDecks(prev => ({ ...prev, [id]: deck }));
+    return id;
+  };
+
+  const updateDeck = (id, patch) => {
+    setCustomDecks(prev => (prev[id] ? { ...prev, [id]: { ...prev[id], ...patch } } : prev));
+  };
+
+  const deleteDeck = (id) => {
+    setCustomDecks(prev => {
+      const copy = { ...prev };
+      delete copy[id];
+      return copy;
+    });
+  };
+
+  const getDeckKnown = (deck) => {
+    if (!deck) return 0;
+    return (deck.items || []).reduce((n, raw) => {
+      const parsed = parseDeckItem(raw);
+      return n + (parsed && isKnown(parsed.topicId, parsed.wordId) ? 1 : 0);
+    }, 0);
+  };
+
   const exportData = () => {
     const data = {
       exportedAt: new Date().toISOString(),
       theme, knownWords, starredWords, reviewItems, mistakes,
       studyHistory, quizScores, streakDays, lastStudyDate,
-      dailyGoal, dailyProgress, xp, sentencesLearned,
+      dailyGoal, dailyProgress, xp, sentencesLearned, customDecks,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -280,6 +327,7 @@ export function AppProvider({ children }) {
       if (data.dailyProgress) setDailyProgress(data.dailyProgress);
       if (typeof data.xp === 'number') setXp(data.xp);
       if (data.sentencesLearned) setSentencesLearned(data.sentencesLearned);
+      if (data.customDecks) setCustomDecks(data.customDecks);
       return true;
     } catch {
       return false;
@@ -298,6 +346,7 @@ export function AppProvider({ children }) {
     setDailyProgress({});
     setXp(0);
     setSentencesLearned({});
+    setCustomDecks({});
   };
 
   return (
@@ -306,11 +355,13 @@ export function AppProvider({ children }) {
       knownWords, starredWords, reviewItems, mistakes,
       studyHistory, quizScores, streakDays, dailyGoal, setDailyGoal,
       dailyProgress, xp, sentencesLearned, toggleSentenceLearned,
+      customDecks, createDeck, updateDeck, deleteDeck, getDeckKnown,
       markKnown, markUnknown, reviewCard, isKnown, isStarred, toggleStar,
       getTopicProgress, getTotalKnown, getDueReviews, getReviewCount, getTotalInReview,
       addQuizScore, getTotalStarred, getAvgQuizScore, getBestQuizScore,
       getTodayCount, getWeekHistory, getLevel, getLevelProgress,
       getTopMistakes, exportData, importData, resetProgress,
+      xpToasts,
     }}>
       {children}
     </AppContext.Provider>

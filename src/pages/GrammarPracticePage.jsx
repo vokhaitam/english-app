@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useApp } from '../context/AppContext';
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 
 export default function GrammarPracticePage() {
   const { grammarPractice } = useLanguage();
+  const { addQuizScore } = useApp();
   const [screen, setScreen] = useState('start'); // 'start' | 'quiz' | 'done'
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
@@ -36,6 +38,7 @@ export default function GrammarPracticePage() {
       setCurrent(c => c + 1);
       setSelected(null);
     } else {
+      addQuizScore(correctCount, questions.length, 'grammar');
       setScreen('done');
     }
   };

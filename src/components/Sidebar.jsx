@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -7,17 +7,16 @@ import InstallButton from './InstallButton';
 // japaneseOnly: mục chỉ có ý nghĩa với gói Nhật.
 const navItems = [
   { to: '/', icon: '🏠', label: 'Dashboard', short: 'Trang chủ' },
+  { to: '/roadmap', icon: '🗺️', label: 'Lộ trình', short: 'Lộ trình' },
   { to: '/study', icon: '📚', label: 'Học từ vựng', short: 'Từ vựng' },
+  { to: '/quiz', icon: '🎯', label: 'Quiz', short: 'Quiz' },
+  { to: '/games', icon: '🎮', label: 'Game', short: 'Game' },
+  { to: '/my-decks', icon: '🗂️', label: 'Bộ từ của tôi', short: 'Bộ từ' },
   { to: '/kana', icon: '🔤', label: 'Bảng kana', short: 'Kana', japaneseOnly: true },
   { to: '/grammar', icon: '📘', label: 'Ngữ pháp', short: 'Ngữ pháp' },
   { to: '/grammar-practice', icon: '✍️', label: 'Luyện tập ngữ pháp', short: 'Luyện tập' },
   { to: '/review', icon: '🔁', label: 'Ôn tập', short: 'Ôn tập' },
-  { to: '/daily-sentence', icon: '💬', label: 'Câu giao tiếp', short: 'Câu mẫu' },
   { to: '/listening', icon: '🎧', label: 'Luyện nghe', short: 'Luyện nghe' },
-  { to: '/quiz', icon: '🎯', label: 'Quiz', short: 'Quiz' },
-  { to: '/word-rain', icon: '⌨️', label: 'Mưa từ vựng', short: 'Mưa từ' },
-  { to: '/typing-practice', icon: '✍️', label: 'Luyện ghi từ', short: 'Ghi từ' },
-  { to: '/bookmarks', icon: '⭐', label: 'Đã đánh dấu', short: 'Yêu thích' },
   { to: '/stats', icon: '📊', label: 'Thống kê', short: 'Thống kê' },
 ];
 
@@ -26,11 +25,17 @@ export default function Sidebar() {
   const { lang, languages, selectLanguage, pack } = useLanguage();
   const dueCount = getReviewCount();
   const visibleNavItems = navItems.filter(i => !i.japaneseOnly || lang === 'ja');
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem('sidebar-collapsed') === '1');
+
+  useEffect(() => {
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
+    localStorage.setItem('sidebar-collapsed', collapsed ? '1' : '0');
+  }, [collapsed]);
 
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
         <NavLink to="/" className="sidebar-logo">
           <div className="sidebar-logo-icon">{pack.flag}</div>
           <span className="sidebar-logo-text">WordFlow</span>
@@ -73,7 +78,7 @@ export default function Sidebar() {
               }
             >
               <span className="nav-icon">{item.icon}</span>
-              {item.label}
+              <span className="nav-label">{item.label}</span>
               {item.to === '/review' && dueCount > 0 && (
                 <span className="nav-badge">{dueCount}</span>
               )}
@@ -82,9 +87,9 @@ export default function Sidebar() {
         </nav>
 
         <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="card sidebar-level-card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ fontSize: '1.4rem' }}>🏅</div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1 }} className="sidebar-level-info">
               <div style={{ fontFamily: 'var(--font-display)', fontWeight: '700', fontSize: '0.9rem' }}>
                 Cấp {getLevel()}
               </div>
@@ -96,9 +101,19 @@ export default function Sidebar() {
 
           <button className="theme-toggle" onClick={toggleTheme} title="Đổi sáng / tối">
             <span>{theme === 'light' ? '🌙' : '☀️'}</span>
-            <span>{theme === 'light' ? 'Chế độ tối' : 'Chế độ sáng'}</span>
+            <span className="theme-toggle-label">{theme === 'light' ? 'Chế độ tối' : 'Chế độ sáng'}</span>
           </button>
           <InstallButton />
+          <button
+            type="button"
+            className="sidebar-collapse"
+            onClick={() => setCollapsed(c => !c)}
+            title={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'}
+            aria-label={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'}
+          >
+            <span>{collapsed ? '»' : '«'}</span>
+            {!collapsed && <span>Thu gọn</span>}
+          </button>
         </div>
       </aside>
 

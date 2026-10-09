@@ -74,7 +74,7 @@ function buildPool(topicId, vocabulary) {
 }
 
 export default function TypingPracticePage() {
-  const { topics, vocabulary } = useLanguage();
+  const { topics, vocabulary, pack, isJapanese } = useLanguage();
   const { markKnown, markUnknown } = useApp();
   const [dir, setDir] = useState('en2vi'); // 'en2vi' | 'vi2en'
   const [phase, setPhase] = useState('topic'); // 'topic' | 'playing' | 'done'
@@ -88,6 +88,10 @@ export default function TypingPracticePage() {
 
   const inputRef = useRef(null);
   const awardedRef = useRef(new Set());
+
+  const langLabel = isJapanese ? 'Nhật' : 'Anh';
+  const langFlag = pack?.flag || '🇬🇧';
+  const langFull = pack?.name || 'tiếng Anh';
 
   const topic = topics.find(t => t.id === topicId);
   const current = pool[idx] || null;
@@ -155,7 +159,7 @@ export default function TypingPracticePage() {
       <div className="fade-in">
         <div className="page-header">
           <h1 className="page-title">✍️ Luyện ghi từ</h1>
-          <p className="page-subtitle">Nhìn từ tiếng Anh gõ nghĩa tiếng Việt — và ngược lại. Chọn chủ đề để bắt đầu!</p>
+          <p className="page-subtitle">Nhìn từ {langFull} gõ nghĩa tiếng Việt — và ngược lại. Chọn chủ đề để bắt đầu!</p>
         </div>
 
         <div className="tp-dir">
@@ -164,14 +168,14 @@ export default function TypingPracticePage() {
             className={`tp-dir-btn ${dir === 'en2vi' ? 'active' : ''}`}
             onClick={() => setDir('en2vi')}
           >
-            🇬🇧→🇻🇳 Nhìn Anh gõ Việt
+            {langFlag}→🇻🇳 Nhìn {langLabel} gõ Việt
           </button>
           <button
             type="button"
             className={`tp-dir-btn ${dir === 'vi2en' ? 'active' : ''}`}
             onClick={() => setDir('vi2en')}
           >
-            🇻🇳→🇬🇧 Nhìn Việt gõ Anh
+            🇻🇳→{langFlag} Nhìn Việt gõ {langLabel}
           </button>
         </div>
 
@@ -226,7 +230,7 @@ export default function TypingPracticePage() {
           <strong style={{ color: 'var(--text-primary)' }}>
             {topicId === 'all' ? 'tất cả chủ đề' : (topic?.name || '')}
           </strong>{' '}
-          (chiều {dir === 'en2vi' ? 'Anh → Việt' : 'Việt → Anh'})
+          (chiều {dir === 'en2vi' ? `${langLabel} → Việt` : `Việt → ${langLabel}`})
         </p>
 
         <div className="completion-stats">
@@ -265,7 +269,7 @@ export default function TypingPracticePage() {
         </div>
         <h1 className="page-title">✍️ Luyện ghi từ</h1>
         <p className="page-subtitle">
-          Chiều {returning ? '🇬🇧→🇻🇳 Anh → Việt' : '🇻🇳→🇬🇧 Việt → Anh'}
+          Chiều {returning ? `${langFlag}→🇻🇳 ${langLabel} → Việt` : `🇻🇳→${langFlag} Việt → ${langLabel}`}
         </p>
       </div>
 
@@ -275,14 +279,14 @@ export default function TypingPracticePage() {
           className={`tp-dir-btn ${dir === 'en2vi' ? 'active' : ''}`}
           onClick={() => setDir('en2vi')}
         >
-          🇬🇧→🇻🇳
+          {langFlag}→🇻🇳
         </button>
         <button
           type="button"
           className={`tp-dir-btn ${dir === 'vi2en' ? 'active' : ''}`}
           onClick={() => setDir('vi2en')}
         >
-          🇻🇳→🇬🇧
+          🇻🇳→{langFlag}
         </button>
       </div>
 
@@ -297,7 +301,7 @@ export default function TypingPracticePage() {
         <div className="tp-prompt">
           {feedback ? null : (
             <div className="tp-prompt-label">
-              {returning ? 'Tiếng Anh' : 'Nghĩa tiếng Việt'}
+              {returning ? langFull : 'Nghĩa tiếng Việt'}
             </div>
           )}
 
@@ -355,7 +359,7 @@ export default function TypingPracticePage() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKey}
-            placeholder={returning ? 'Gõ nghĩa tiếng Việt...' : 'Gõ từ tiếng Anh...'}
+            placeholder={returning ? 'Gõ nghĩa tiếng Việt...' : `Gõ từ ${isJapanese ? 'tiếng Nhật (romaji/kana)...' : 'tiếng Anh...'}`}
             disabled={!!feedback}
             spellCheck={false}
             autoComplete="off"
@@ -377,7 +381,7 @@ export default function TypingPracticePage() {
         <div className="tp-hint">
           {returning
             ? 'Chỉ cần gõ một nghĩa đúng; có thể gõ không dấu (vd: "xin chao" vẫn đúng). Nhấn Enter để kiểm tra nhanh.'
-            : 'Gõ đúng từ tiếng Anh (không cần phân biệt hoa/thường). Nhấn Enter để kiểm tra nhanh.'}
+            : `Gõ đúng từ ${isJapanese ? 'tiếng Nhật (bằng romaji hoặc kana)' : 'tiếng Anh (không cần phân biệt hoa/thường)'}. Nhấn Enter để kiểm tra nhanh.`}
         </div>
       </div>
     </div>

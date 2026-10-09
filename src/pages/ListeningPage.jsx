@@ -9,7 +9,7 @@ const normalize = (s) => s.trim().toLowerCase().replace(/[^a-z\s]/gi, '').replac
 const answerFor = (w) => (w.romaji || w.word);
 
 export default function ListeningPage() {
-  const { vocabulary, topics } = useLanguage();
+  const { vocabulary, topics, pack, isJapanese } = useLanguage();
   const { addQuizScore } = useApp();
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [mode, setMode] = useState('select');
@@ -43,7 +43,7 @@ export default function ListeningPage() {
       <div className="fade-in">
         <div className="page-header">
           <h1 className="page-title">🎧 Luyện nghe</h1>
-          <p className="page-subtitle">Nghe phát âm và gõ chính tả từ tiếng Anh</p>
+          <p className="page-subtitle">Nghe phát âm và gõ chính tả từ {pack?.name || 'tiếng Anh'}</p>
         </div>
         <div className="topic-grid">
           <div key="all" className="topic-card" style={{ '--topic-gradient': 'var(--gradient-hero)' }} onClick={() => start('all')}>
@@ -149,7 +149,7 @@ export default function ListeningPage() {
           className="listen-input"
           value={typed}
           onChange={e => setTyped(e.target.value)}
-          placeholder="Gõ từ tiếng Anh..."
+          placeholder={isJapanese ? "Gõ romaji hoặc kana..." : "Gõ từ tiếng Anh..."}
           onKeyDown={e => { if (e.key === 'Enter' && !answered) check(); }}
           disabled={answered}
           autoFocus

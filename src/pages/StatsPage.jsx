@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { splitWordKey } from '../lib/wordKey';
+import { localDateKey } from '../lib/dateHelpers';
+import { getQuizSource } from '../lib/quizLabels';
 import { useApp } from '../context/AppContext';
 
 function RadialProgress({ value, size = 80, strokeWidth = 7, color = 'var(--accent-primary)' }) {
@@ -23,12 +25,13 @@ function RadialProgress({ value, size = 80, strokeWidth = 7, color = 'var(--acce
 }
 
 export default function StatsPage() {
-  const { vocabulary, topics } = useLanguage();
+  const { vocabulary, topics, pack } = useLanguage();
   const {
     quizScores, streakDays, getTotalKnown, getTotalStarred,
     getAvgQuizScore, getBestQuizScore, getWeekHistory, getLevel, getLevelProgress,
     xp, dailyGoal, setDailyGoal, getTodayCount, getTopMistakes,
     exportData, importData, resetProgress, getTotalInReview, getTopicProgress,
+    dailyProgress, customDecks,
   } = useApp();
   const fileRef = useRef(null);
   const [msg, setMsg] = useState('');
@@ -69,6 +72,14 @@ export default function StatsPage() {
     { id: 'star10', icon: '⭐', title: 'Bộ sưu tập', desc: 'Đánh dấu 10 từ', done: s.starred >= 10 },
     { id: 'rev20', icon: '🔁', title: 'Chăm ôn tập', desc: 'Có 20 từ trong danh sách ôn', done: s.review >= 20 },
     { id: 'level5', icon: '🚀', title: 'Cấp 5', desc: 'Đạt cấp độ 5', done: s.level >= 5 },
+    {
+      id: 'game1',
+      icon: '🎮',
+      title: 'Game thủ',
+      desc: 'Hoàn thành một ván game',
+      done: quizScores.some(q => typeof q.topicId === 'string' && q.topicId.startsWith('game:')),
+    },
+    { id: 'deck1', icon: '🗂️', title: 'Người biên soạn', desc: 'Tạo một bộ từ cá nhân', done: Object.keys(customDecks).length >= 1 },
   ];
 
   const handleImport = (e) => {
@@ -88,7 +99,7 @@ export default function StatsPage() {
     <div className="fade-in">
       <div className="page-header">
         <h1 className="page-title">📊 Thống kê</h1>
-        <p className="page-subtitle">Theo dõi hành trình học tiếng Anh của bạn</p>
+        <p className="page-subtitle">Theo dõi hành trình học {pack?.name || 'từ vựng'} của bạn</p>
       </div>
 
       {/* Summary */}
@@ -157,6 +168,35 @@ export default function StatsPage() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Streak 30 ngày — dựa trên dailyProgress thật */}
+      <div className="card" style={{ marginBottom: '24px' }}>
+        <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
+          <h2 className="section-title">🔥 Biểu đồ streak 30 ngày</h2>
+          <span className="badge badge-yellow">{streakDays} ngày liên tiếp</span>
+        </div>
+        <div className="streak-heatmap">
+          {Array.from({ length: 30 }, (_, i) => {
+            const date = new Date(Date.now() - (29 - i) * 86400000);
+            const count = dailyProgress[localDateKey(date)] || 0;
+            const level = count === 0 ? 0 : count < 10 ? 1 : count < 25 ? 2 : 3;
+            return (
+              <div
+                key={i}
+                className={`heat-cell level-${level} ${i === 29 ? 'today' : ''}`}
+                title={`${date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}: ${count} từ`}
+              />
+            );
+          })}
+        </div>
+        <div className="flex items-center gap-md" style={{ marginTop: '12px', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Ít → nhiều</span>
+          {[0, 1, 2, 3].map(l => (
+            <div key={l} className={`heat-cell level-${l}`} style={{ width: '14px', height: '14px' }} />
+          ))}
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>≥ 25 từ</span>
         </div>
       </div>
 
@@ -237,15 +277,15 @@ export default function StatsPage() {
           <h2 className="section-title" style={{ marginBottom: '16px' }}>🎯 Lịch sử quiz</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {quizScores.slice(0, 10).map((q, i) => {
-              const topic = topics.find(t => t.id === q.topicId);
+              const source = getQuizSource(q.topicId, topics, customDecks);
               const pct = Math.round((q.score / q.total) * 100);
               const date = new Date(q.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
               return (
                 <div key={i} className="flex items-center justify-between" style={{ padding: '12px 16px', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
                   <div className="flex items-center gap-md">
-                    <span>{topic?.icon || '🎯'}</span>
+                    <span>{source.icon}</span>
                     <div>
-                      <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{topic?.name || (q.topicId === 'all' ? 'Trộn tất cả' : 'Quiz')}</div>
+                      <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{source.label}</div>
                       <div className="text-muted" style={{ fontSize: '0.75rem' }}>{date}</div>
                     </div>
                   </div>

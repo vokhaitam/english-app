@@ -1,6 +1,9 @@
 // Câu giao tiếp mẫu.
 // `en` giữ câu tiếng Nhật, `vi` là nghĩa, `pron` là romaji để luyện nghe và gõ.
-export const dailySentences = [
+import { dailySentences as extra1 } from './sentences-extra1.js';
+import { dailySentences as extra2 } from './sentences-extra2.js';
+
+const base = [
   {
     id: 1,
     en: 'おはようございます。',
@@ -41,7 +44,7 @@ export const dailySentences = [
   {
     id: 4,
     en: 'すみません、駅はどこですか。',
-    pron: 'sumimasen, eki wa doko desu ka',
+    pron: 'sumimasen eki wa doko desu ka',
     vi: 'Xin lỗi, ga ở đâu ạ?',
     tag: 'Hỏi đường',
     grammar: { name: 'すみません + どこですか', explanation: '「すみません」 dùng để bắt đầu khi xin phép người lạ. 「どこですか」 là câu hỏi lịch sự kèm ngữ điệu lên ở cuối.' },
@@ -114,14 +117,14 @@ export const dailySentences = [
   },
   {
     id: 10,
-    en: 'いただきます。',
-    pron: 'itadakimasu',
-    vi: 'Xin nhận.',
+    en: 'これをください。',
+    pron: 'kore o kudasai',
+    vi: 'Cho tôi cái này ạ.',
     tag: 'Mua sắm',
-    grammar: { name: 'いただきます', explanation: 'Khi người bán đưa đồ, bạn nói いただきます để nhận lấy.' },
+    grammar: { name: '〜をください', explanation: 'Dùng「〜をください」để yêu cầu người đưa hoặc bán cho mình một thứ gì đó.' },
     breakdown: [
-      { part: 'いただきます', note: 'nhận' },
-      { part: 'いただきます', note: 'quá khứ' },
+      { part: 'これを', note: 'cái này (chỉ định)' },
+      { part: 'ください', note: 'cho tôi ạ' },
     ],
   },
   {
@@ -139,7 +142,7 @@ export const dailySentences = [
   {
     id: 12,
     en: 'すみません、もう一度お願いします。',
-    pron: 'sumimasen, mou ichido onegai shimasu',
+    pron: 'sumimasen mou ichido onegai shimasu',
     vi: 'Xin lỗi, làm ơn nhắc lại một lần nữa.',
     tag: 'Giao tiếp',
     grammar: { name: 'もう一度 / もういちど', explanation: '「もう一度」 là cách nói lịch sự hơn 「もう一回」.' },
@@ -150,3 +153,5 @@ export const dailySentences = [
     ],
   },
 ];
+
+export const dailySentences = [...base, ...extra1, ...extra2];

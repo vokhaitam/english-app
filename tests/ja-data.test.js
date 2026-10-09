@@ -4,6 +4,29 @@ import { topic, words } from '../src/data/ja/vocab/greetings';
 import * as numbersTime from '../src/data/ja/vocab/numbers-time';
 import * as dailyLife from '../src/data/ja/vocab/daily-life';
 import * as food from '../src/data/ja/vocab/food';
+import * as family from '../src/data/ja/vocab/family';
+import * as bodyHealth from '../src/data/ja/vocab/body-health';
+import * as homePlaces from '../src/data/ja/vocab/home-places';
+import * as schoolWork from '../src/data/ja/vocab/school-work';
+import * as shopping from '../src/data/ja/vocab/shopping';
+import * as transportation from '../src/data/ja/vocab/transportation';
+import * as directions from '../src/data/ja/vocab/directions';
+import * as clothesFashion from '../src/data/ja/vocab/clothes-fashion';
+import * as animalsNature from '../src/data/ja/vocab/animals-nature';
+import * as nature from '../src/data/ja/vocab/nature';
+import * as weather from '../src/data/ja/vocab/weather';
+import * as householdItems from '../src/data/ja/vocab/household-items';
+import * as sportsHobbies from '../src/data/ja/vocab/sports-hobbies';
+import * as emotionsPersonality from '../src/data/ja/vocab/emotions-personality';
+import * as phoneInternet from '../src/data/ja/vocab/phone-internet';
+import * as travelDaily from '../src/data/ja/vocab/travel-daily';
+import * as emergencies from '../src/data/ja/vocab/emergencies';
+import * as workplace from '../src/data/ja/vocab/workplace';
+import * as technologyMedia from '../src/data/ja/vocab/technology-media';
+import * as services from '../src/data/ja/vocab/services';
+import * as science from '../src/data/ja/vocab/science';
+import * as environmentSociety from '../src/data/ja/vocab/environment-society';
+import * as newsMedia from '../src/data/ja/vocab/news-media';
 import { kanaChart, kanaRows, counters, numberWords } from '../src/data/ja/kana';
 import { checkTopic } from './helpers/checkTopic';
 
@@ -15,6 +38,29 @@ const jaTopics = [
   ['ja-numbers-time', numbersTime],
   ['ja-daily-life', dailyLife],
   ['ja-food', food],
+  ['ja-family', family],
+  ['ja-body-health', bodyHealth],
+  ['ja-home-places', homePlaces],
+  ['ja-school-work', schoolWork],
+  ['ja-shopping', shopping],
+  ['ja-transportation', transportation],
+  ['ja-directions', directions],
+  ['ja-clothes-fashion', clothesFashion],
+  ['ja-animals-nature', animalsNature],
+  ['ja-nature', nature],
+  ['ja-weather', weather],
+  ['ja-household-items', householdItems],
+  ['ja-sports-hobbies', sportsHobbies],
+  ['ja-emotions-personality', emotionsPersonality],
+  ['ja-phone-internet', phoneInternet],
+  ['ja-travel-daily', travelDaily],
+  ['ja-emergencies', emergencies],
+  ['ja-workplace', workplace],
+  ['ja-technology-media', technologyMedia],
+  ['ja-services', services],
+  ['ja-science', science],
+  ['ja-environment-society', environmentSociety],
+  ['ja-news-media', newsMedia],
 ];
 
 /**
@@ -132,7 +178,7 @@ describe('mọi topic tiếng Nhật', () => {
     expect(ja.topics.every(t => t.name && t.kana && t.icon && t.level)).toBe(true);
     const total = Object.values(ja.vocabulary).reduce((a, b) => a + b.length, 0);
     expect(total).toBe(jaTopics.reduce((a, [, m]) => a + m.words.length, 0));
-    expect(total).toBeGreaterThanOrEqual(200);
+    expect(total).toBeGreaterThanOrEqual(1200);
     // getAllWords phải gắn topicId để tiến trình tách theo chủ đề.
     expect(ja.getAllWords().every(w => w.topicId)).toBe(true);
   });

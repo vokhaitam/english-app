@@ -4,6 +4,29 @@ import * as greetings from './vocab/greetings';
 import * as numbersTime from './vocab/numbers-time';
 import * as dailyLife from './vocab/daily-life';
 import * as food from './vocab/food';
+import * as family from './vocab/family';
+import * as bodyHealth from './vocab/body-health';
+import * as homePlaces from './vocab/home-places';
+import * as schoolWork from './vocab/school-work';
+import * as shopping from './vocab/shopping';
+import * as transportation from './vocab/transportation';
+import * as directions from './vocab/directions';
+import * as clothesFashion from './vocab/clothes-fashion';
+import * as animalsNature from './vocab/animals-nature';
+import * as nature from './vocab/nature';
+import * as weather from './vocab/weather';
+import * as householdItems from './vocab/household-items';
+import * as sportsHobbies from './vocab/sports-hobbies';
+import * as emotionsPersonality from './vocab/emotions-personality';
+import * as phoneInternet from './vocab/phone-internet';
+import * as travelDaily from './vocab/travel-daily';
+import * as emergencies from './vocab/emergencies';
+import * as workplace from './vocab/workplace';
+import * as technologyMedia from './vocab/technology-media';
+import * as services from './vocab/services';
+import * as science from './vocab/science';
+import * as environmentSociety from './vocab/environment-society';
+import * as newsMedia from './vocab/news-media';
 import { grammarLessons as rawLessons } from './grammar';
 import { grammarReadings } from './grammarReadings';
 import { dailySentences } from './sentences';
@@ -12,8 +35,15 @@ import {
   counters, numberWords, countingRules, verbClasses,
 } from './kana';
 
-// Thứ tự học: chào hỏi -> số và thời gian -> cuộc sống hằng ngày -> ăn uống.
-const topicModules = [greetings, numbersTime, dailyLife, food];
+// Thứ tự học: nền tảng (chào hỏi, số, đời sống, ăn uống) -> N5 -> N4 -> N3.
+const topicModules = [
+  greetings, numbersTime, dailyLife, food,
+  family, bodyHealth, homePlaces, schoolWork, shopping,
+  transportation, directions, clothesFashion,
+  animalsNature, nature, weather, householdItems, sportsHobbies,
+  emotionsPersonality, phoneInternet, travelDaily, emergencies, workplace,
+  technologyMedia, services, science, environmentSociety, newsMedia,
+];
 
 // Trang hiện tại dùng topic.name để hiển thị, nên đặt tên tiếng Việt vào name
 // còn kanji/kana đặt vào kana để dùng khi cần.

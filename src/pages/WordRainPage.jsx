@@ -133,7 +133,7 @@ function destroyLetter(g, w, ch, ok) {
 }
 
 export default function WordRainPage() {
-  const { topics, vocabulary } = useLanguage();
+  const { topics, vocabulary, pack, isJapanese } = useLanguage();
   const { markKnown } = useApp();
   const [phase, setPhase] = useState('mode'); // 'mode' | 'topic' | 'config' | 'playing'
   const [mode, setMode] = useState('vocab'); // 'vocab' | 'letters'
@@ -329,7 +329,7 @@ export default function WordRainPage() {
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'var(--gradient-hero)', borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0' }} />
             <div className="topic-icon">📖</div>
             <div className="topic-name">Mưa từ vựng</div>
-            <div className="topic-count">Gõ đúng từ tiếng Anh — xem nghĩa tiếng Việt khi trúng</div>
+            <div className="topic-count">Gõ đúng từ {pack?.name || 'tiếng Anh'} — xem nghĩa tiếng Việt khi trúng</div>
           </div>
           <div
             className="topic-card"
@@ -557,7 +557,7 @@ export default function WordRainPage() {
               value={typed}
               onChange={e => handleTyping(e.target.value)}
               onKeyDown={handleInputKey}
-              placeholder="Gõ từ tiếng Anh đang rơi..."
+              placeholder={isJapanese ? "Gõ romaji của từ đang rơi..." : "Gõ từ tiếng Anh đang rơi..."}
               spellCheck={false}
               autoComplete="off"
               autoCorrect="off"

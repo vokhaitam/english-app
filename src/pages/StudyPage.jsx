@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import FlashCard from '../components/FlashCard';
 import TopicSelector from '../components/TopicSelector';
+import { wordKey as makeWordKey } from '../lib/wordKey';
+import { resolveDeckItems } from '../lib/deckBuilder';
 
 const TYPE_LABELS = {
   noun: 'Danh từ',
@@ -17,21 +19,29 @@ const TYPE_LABELS = {
 
 export default function StudyPage() {
   const { vocabulary, topics, levels, getAllWords, lang } = useLanguage();
-  const { markKnown, markUnknown, isStarred, toggleStar, knownWords } = useApp();
+  const { markKnown, markUnknown, isStarred, toggleStar, customDecks, starredWords } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
   const level = searchParams.get('level');
   const topicParam = searchParams.get('topic');
   const wordParam = searchParams.get('w');
+  const deckParam = searchParams.get('deck');
+  const starredParam = searchParams.get('starred') === '1';
+  const deck = deckParam ? customDecks[deckParam] || null : null;
+  const inDeck = !!deck;
+  const deckWords = useMemo(
+    () => (deck ? resolveDeckItems(deck.items, vocabulary) : []),
+    [deck, vocabulary],
+  );
   const selectedTopic = topicParam && vocabulary[topicParam] ? topicParam : null;
   const [cardIndex, setCardIndex] = useState(0);
   const [knownCount, setKnownCount] = useState(0);
   const [dontKnowCount, setDontKnowCount] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [prevKey, setPrevKey] = useState(`${selectedTopic ?? ''}|${wordParam ?? ''}`);
+  const [prevKey, setPrevKey] = useState(`${selectedTopic ?? ''}|${wordParam ?? ''}|${deckParam ?? ''}|${starredParam ? '1' : ''}`);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Reset per-topic state when the URL topic/word changes (derived state pattern)
-  const key = `${selectedTopic ?? ''}|${wordParam ?? ''}`;
+  // Reset per-topic state when the URL topic/word/deck/starred changes (derived state pattern)
+  const key = `${selectedTopic ?? ''}|${wordParam ?? ''}|${deckParam ?? ''}|${starredParam ? '1' : ''}`;
   if (key !== prevKey) {
     setPrevKey(key);
     const words = selectedTopic ? vocabulary[selectedTopic] : [];
@@ -45,6 +55,11 @@ export default function StudyPage() {
   }
 
   const allWords = useMemo(() => getAllWords(), [getAllWords]);
+  const inStarred = starredParam && !inDeck;
+  const starredList = useMemo(
+    () => allWords.filter(w => starredWords[makeWordKey(lang, w.topicId, w.id)]),
+    [allWords, starredWords, lang],
+  );
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const q = searchQuery.trim().toLowerCase();
@@ -53,12 +68,9 @@ export default function StudyPage() {
       .slice(0, 20);
   }, [searchQuery, allWords]);
 
-  const words = selectedTopic ? vocabulary[selectedTopic] : [];
+  const words = inStarred ? starredList : inDeck ? deckWords : selectedTopic ? vocabulary[selectedTopic] : [];
   const currentWord = words[cardIndex] || null;
-
-  const progress = Object.fromEntries(
-    Object.entries(knownWords).map(([k, v]) => [k, { known: v.length }])
-  );
+  const currentTopicId = (inDeck || inStarred) ? currentWord?.topicId || null : selectedTopic;
 
   const levelTopics = level ? topics.filter(t => t.level === level) : [];
   const activeLevel = levels.find(l => l.id === level);
@@ -70,13 +82,13 @@ export default function StudyPage() {
   const backToTopics = () => setSearchParams(level ? { level } : {});
 
   const handleKnow = () => {
-    if (currentWord) markKnown(selectedTopic, currentWord.id);
+    if (currentWord && currentTopicId) markKnown(currentTopicId, currentWord.id);
     setKnownCount(k => k + 1);
     goNext();
   };
 
   const handleDontKnow = () => {
-    if (currentWord) markUnknown(selectedTopic, currentWord.id);
+    if (currentWord && currentTopicId) markUnknown(currentTopicId, currentWord.id);
     setDontKnowCount(k => k + 1);
     goNext();
   };
@@ -93,11 +105,27 @@ export default function StudyPage() {
     if (cardIndex > 0) setCardIndex(i => i - 1);
   };
 
-  const wordKey = currentWord ? `${selectedTopic}-${currentWord.id}` : '';
+  const starKey = currentWord && currentTopicId ? makeWordKey(lang, currentTopicId, currentWord.id) : '';
   const selectedTopicData = topics.find(t => t.id === selectedTopic);
 
+  // ---- DECK NOT FOUND ----
+  if (deckParam && !deck) {
+    return (
+      <div className="fade-in">
+        <div className="page-header">
+          <h1 className="page-title">🗂️ Không tìm thấy bộ từ</h1>
+          <p className="page-subtitle">Bộ từ này có thể đã bị xóa</p>
+        </div>
+        <div className="flex gap-md">
+          <Link to="/my-decks" className="btn btn-primary">← Về bộ từ của tôi</Link>
+          <Link to="/study" className="btn btn-secondary">📚 Học theo chủ đề</Link>
+        </div>
+      </div>
+    );
+  }
+
   // ---- LEVEL SELECT SCREEN ----
-  if (!selectedTopic && !level) {
+  if (!selectedTopic && !level && !inDeck && !inStarred) {
     const totalWords = topics.reduce((sum, t) => sum + (vocabulary[t.id]?.length || 0), 0);
     return (
       <div className="fade-in">
@@ -223,6 +251,29 @@ export default function StudyPage() {
                   </div>
                 );
               })}
+              <div
+                className="topic-card"
+                style={{ '--topic-gradient': 'linear-gradient(135deg, #f5a623, #ffce73)' }}
+                onClick={() => setSearchParams({ starred: '1' })}
+              >
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '3px',
+                  background: 'linear-gradient(135deg, #f5a623, #ffce73)',
+                  borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
+                }} />
+                <div className="topic-icon">⭐</div>
+                <div className="topic-name">Đã đánh dấu</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                  Ôn lại những từ bạn đã lưu yêu thích
+                </div>
+                <div className="topic-count">
+                  {starredList.length} từ
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -236,7 +287,7 @@ export default function StudyPage() {
   }
 
   // ---- TOPIC SELECT SCREEN (inside a level) ----
-  if ((!selectedTopic) && level) {
+  if ((!selectedTopic) && level && !inDeck && !inStarred) {
     return (
       <div className="fade-in">
         <div className="page-header">
@@ -255,7 +306,6 @@ export default function StudyPage() {
         <TopicSelector
           topics={levelTopics}
           onSelect={selectTopic}
-          progress={progress}
         />
       </div>
     );
@@ -273,7 +323,10 @@ export default function StudyPage() {
           {accuracy >= 80 ? 'Xuất sắc!' : accuracy >= 60 ? 'Tốt lắm!' : 'Cố lên!'}
         </h2>
         <p className="text-secondary">
-          Bạn đã hoàn thành chủ đề <strong style={{ color: 'var(--text-primary)' }}>{selectedTopicData?.name}</strong>
+          Bạn đã hoàn thành {inDeck ? 'bộ từ' : inStarred ? 'danh sách' : 'chủ đề'}{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>
+            {inDeck ? deck.name : inStarred ? '⭐ Từ đã đánh dấu' : selectedTopicData?.name}
+          </strong>
         </p>
 
         <div className="completion-stats">
@@ -309,15 +362,21 @@ export default function StudyPage() {
           >
             🔄 Học lại
           </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              setIsCompleted(false);
-              backToTopics();
-            }}
-          >
-            📚 Chủ đề khác
-          </button>
+          {inDeck ? (
+            <Link to="/my-decks" className="btn btn-primary">
+              🗂️ Bộ từ của tôi
+            </Link>
+          ) : (
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                setIsCompleted(false);
+                backToTopics();
+              }}
+            >
+              📚 Chủ đề khác
+            </button>
+          )}
         </div>
       </div>
     );
@@ -327,16 +386,30 @@ export default function StudyPage() {
   return (
     <div className="fade-in">
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-        <button
-          className="btn btn-ghost btn-sm"
-          onClick={() => {
-            backToTopics();
-          }}
-        >
-          ← Chọn chủ đề
-        </button>
+        {inDeck ? (
+          <Link to="/my-decks" className="btn btn-ghost btn-sm">
+            ← Bộ từ của tôi
+          </Link>
+        ) : inStarred ? (
+          <Link to="/study" className="btn btn-ghost btn-sm">
+            ← Học từ vựng
+          </Link>
+        ) : (
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => {
+              backToTopics();
+            }}
+          >
+            ← Chọn chủ đề
+          </button>
+        )}
         <div className="badge badge-purple">
-          {selectedTopicData?.icon} {selectedTopicData?.name}
+          {inDeck
+            ? `${deck.icon} ${deck.name}`
+            : inStarred
+              ? '⭐ Từ đã đánh dấu'
+              : `${selectedTopicData?.icon} ${selectedTopicData?.name}`}
         </div>
       </div>
 
@@ -349,9 +422,21 @@ export default function StudyPage() {
           onDontKnow={handleDontKnow}
           onNext={goNext}
           onPrev={goPrev}
-          isStarred={isStarred(wordKey)}
-          onToggleStar={() => toggleStar(wordKey)}
+          isStarred={isStarred(starKey)}
+          onToggleStar={() => toggleStar(starKey)}
         />
+      )}
+      {words.length === 0 && (
+        <div className="empty-state">
+          <div style={{ fontSize: '3rem' }}>{inStarred ? '⭐' : '🗂️'}</div>
+          <h3>{inStarred ? 'Chưa có từ nào được đánh dấu' : 'Bộ từ trống'}</h3>
+          <p className="text-secondary">
+            {inStarred
+              ? 'Bấm ngôi sao trên thẻ khi học để lưu từ vào đây nhé.'
+              : 'Bộ từ này chưa có từ vựng nào để học.'}
+          </p>
+          <Link to="/study" className="btn btn-primary">📚 Học từ vựng</Link>
+        </div>
       )}
     </div>
   );

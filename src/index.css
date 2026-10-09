@@ -4321,7 +4321,7 @@ body.sidebar-collapsed .main-content { margin-left: 78px; }
   animation: floatY 10s ease-in-out infinite 3s;
 }
 
-/* ── Hero Text ── */
+/* ── Hero Text (LUNG LINH) ── */
 .hp-hero-text {
   position: relative;
   z-index: 1;
@@ -4330,94 +4330,158 @@ body.sidebar-collapsed .main-content { margin-left: 78px; }
 .hp-hero-streak-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
+  gap: 8px;
+  padding: 8px 18px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, rgba(232,50,111,0.15), rgba(255,126,166,0.12));
-  border: 1px solid rgba(232,50,111,0.3);
-  font-size: 0.82rem;
-  font-weight: 700;
+  background: linear-gradient(135deg, #fff5e6, #ffe4ec);
+  border: 1.5px solid rgba(232, 50, 111, 0.35);
+  font-size: 0.85rem;
+  font-weight: 800;
   color: var(--accent-primary);
-  margin-bottom: 16px;
-  animation: cardEntrance 0.5s ease both;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 14px rgba(232, 50, 111, 0.2);
+  animation: cardEntrance 0.5s ease both, streakPulse 2.5s ease-in-out infinite 1s;
+}
+
+@keyframes streakPulse {
+  0%, 100% { box-shadow: 0 4px 14px rgba(232, 50, 111, 0.2); }
+  50% { box-shadow: 0 6px 24px rgba(255, 122, 108, 0.4); }
 }
 
 .hp-hero-title {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  font-weight: 800;
-  line-height: 1.15;
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
-  margin: 0 0 16px;
-  animation: cardEntrance 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both;
+  margin: 0 0 18px;
+  animation: cardEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both;
 }
 
 .hp-hero-title-accent {
-  background: linear-gradient(135deg, #c0154a 0%, #e8326f 50%, #ff7ea6 100%);
+  background: linear-gradient(135deg, #ffb547 0%, #ff7a6c 30%, #ff5c8a 60%, #e84e2c 100%);
+  background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 2px 8px rgba(192, 21, 74, 0.15);
+  text-shadow: 0 4px 20px rgba(232, 78, 44, 0.25);
+  animation: gradientShift 6s ease-in-out infinite;
+  display: inline-block;
+  filter: drop-shadow(0 2px 4px rgba(232, 78, 44, 0.15));
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .hp-hero-desc {
-  font-size: 1.05rem;
-  line-height: 1.7;
+  font-size: 1.08rem;
+  line-height: 1.75;
   color: var(--text-secondary);
-  margin-bottom: 10px;
-  max-width: 480px;
-  animation: cardEntrance 0.55s ease 0.1s both;
+  margin-bottom: 12px;
+  max-width: 500px;
+  font-weight: 500;
+  animation: cardEntrance 0.6s ease 0.1s both;
 }
 
 .hp-hero-date {
-  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
   color: var(--text-muted);
-  margin-bottom: 24px;
-  animation: cardEntrance 0.55s ease 0.12s both;
+  margin-bottom: 28px;
+  padding: 4px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  animation: cardEntrance 0.6s ease 0.12s both;
 }
 
 .hp-hero-ctas {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
-  animation: cardEntrance 0.55s ease 0.15s both;
+  margin-bottom: 24px;
+  animation: cardEntrance 0.6s ease 0.15s both;
 }
 
 .hp-cta-primary {
+  position: relative;
   font-size: 1rem !important;
-  padding: 13px 24px !important;
-  box-shadow: 0 6px 20px rgba(232,50,111,0.35) !important;
+  padding: 14px 26px !important;
+  font-weight: 800 !important;
+  border-radius: var(--radius-lg) !important;
+  background: linear-gradient(135deg, #ff7a6c 0%, #ff5c8a 50%, #e84e2c 100%) !important;
+  background-size: 200% 200% !important;
+  box-shadow:
+    0 8px 24px rgba(232, 78, 44, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  animation: gradientShift 4s ease-in-out infinite;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease !important;
+}
+
+.hp-cta-primary:hover {
+  transform: translateY(-3px) scale(1.03) !important;
+  box-shadow:
+    0 12px 32px rgba(232, 78, 44, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+.hp-cta-primary:active {
+  transform: translateY(-1px) scale(0.99) !important;
 }
 
 .hp-cta-secondary {
   font-size: 1rem !important;
-  padding: 13px 24px !important;
+  padding: 14px 26px !important;
+  font-weight: 700 !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-card) !important;
+  border: 1.5px solid rgba(232, 50, 111, 0.25) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 4px 12px rgba(232, 50, 111, 0.1) !important;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.hp-cta-secondary:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 8px 20px rgba(232, 50, 111, 0.2) !important;
+}
+
+.hp-cta-secondary:active {
+  transform: translateY(-1px) scale(0.99) !important;
 }
 
 .hp-hero-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  animation: cardEntrance 0.55s ease 0.2s both;
+  gap: 10px;
+  animation: cardEntrance 0.6s ease 0.2s both;
 }
 
 .hp-hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 12px;
+  gap: 5px;
+  padding: 7px 14px;
   border-radius: var(--radius-full);
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  font-size: 0.78rem;
-  font-weight: 600;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 245, 230, 0.7));
+  border: 1.5px solid rgba(232, 50, 111, 0.2);
+  font-size: 0.8rem;
+  font-weight: 700;
   color: var(--text-secondary);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(6px);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease, box-shadow 0.25s ease;
 }
+
 .hp-hero-badge:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.05);
   border-color: var(--accent-primary);
+  box-shadow: 0 6px 16px rgba(232, 50, 111, 0.2);
 }
 
 /* ── Hero Visual (right col) ── */

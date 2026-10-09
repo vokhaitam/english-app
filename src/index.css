@@ -494,32 +494,21 @@ body::before {
 .mobile-nav {
   display: none;
   position: fixed;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 24px);
-  max-width: 420px;
-  /* Luôn dùng nền tối + viền sáng để nổi trên mọi theme */
-  background: linear-gradient(135deg, rgba(20, 9, 26, 0.92), rgba(30, 17, 38, 0.92));
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 24px;
-  padding: 8px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  /* Luôn màu hồng cho dễ nhìn */
+  background: linear-gradient(180deg, rgba(255, 92, 148, 0.98), rgba(232, 50, 111, 0.98));
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
   z-index: 100;
   box-shadow:
-    0 12px 32px rgba(0, 0, 0, 0.35),
-    0 2px 6px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 -8px 24px rgba(232, 50, 111, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-}
-
-[data-theme="light"] .mobile-nav {
-  background: linear-gradient(135deg, rgba(255, 92, 148, 0.95), rgba(232, 50, 111, 0.95));
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow:
-    0 12px 32px rgba(232, 50, 111, 0.4),
-    0 2px 6px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .mobile-nav-items {
@@ -4204,6 +4193,7 @@ body.sidebar-collapsed .main-content { margin-left: 78px; }
 /* --- Responsive --- */
 @media (max-width: 768px) {
   body.sidebar-collapsed .main-content { margin-left: 0; }
+  body { padding-bottom: 70px; } /* chừa chỗ cho mobile nav dưới đáy */
   .feature-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   .lesson-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 }

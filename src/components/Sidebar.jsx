@@ -10,10 +10,10 @@ const navItems = [
   { to: '/roadmap', icon: '🗺️', label: 'Lộ trình', short: 'Lộ trình' },
   { to: '/study', icon: '📚', label: 'Học từ vựng', short: 'Từ vựng' },
   { to: '/quiz', icon: '🎯', label: 'Quiz', short: 'Quiz' },
-  { to: '/games', icon: '🎮', label: 'Game', short: 'Game' },
-  { to: '/my-decks', icon: '🗂️', label: 'Bộ từ của tôi', short: 'Bộ từ' },
   { to: '/kana', icon: '🔤', label: 'Bảng kana', short: 'Kana', japaneseOnly: true },
   { to: '/grammar', icon: '📘', label: 'Ngữ pháp', short: 'Ngữ pháp' },
+  { to: '/games', icon: '🎮', label: 'Game', short: 'Game' },
+  { to: '/my-decks', icon: '🗂️', label: 'Bộ từ của tôi', short: 'Bộ từ' },
   { to: '/grammar-practice', icon: '✍️', label: 'Luyện tập ngữ pháp', short: 'Luyện tập' },
   { to: '/review', icon: '🔁', label: 'Ôn tập', short: 'Ôn tập' },
   { to: '/listening', icon: '🎧', label: 'Luyện nghe', short: 'Luyện nghe' },
@@ -32,8 +32,52 @@ export default function Sidebar() {
     localStorage.setItem('sidebar-collapsed', collapsed ? '1' : '0');
   }, [collapsed]);
 
+  const mobileItems = visibleNavItems.slice(0, 5);
+
   return (
     <>
+      {/* Mobile Top Header Bar */}
+      <header className="mobile-top-bar">
+        <NavLink to="/" className="mobile-logo">
+          <span className="mobile-logo-flag">{pack.flag}</span>
+          <span className="mobile-logo-name">WordFlow</span>
+        </NavLink>
+
+        <div
+          className="lang-switch mobile-lang-switch"
+          role="group"
+          aria-label="Chọn ngôn ngữ học"
+          style={{ '--lang-count': languages.length }}
+        >
+          <span
+            className="lang-switch-thumb"
+            style={{ transform: `translateX(${Math.max(0, languages.findIndex(l => l.id === lang)) * 100}%)` }}
+            aria-hidden="true"
+          />
+          {languages.map(l => (
+            <button
+              key={l.id}
+              type="button"
+              className={`lang-switch-btn ${l.id === lang ? 'active' : ''}`}
+              onClick={() => selectLanguage(l.id)}
+              aria-pressed={l.id === lang}
+              title={`Học ${l.name}`}
+            >
+              <span className="lang-switch-flag" aria-hidden="true">{l.flag}</span>
+              <span className="lang-switch-name">{l.name}</span>
+            </button>
+          ))}
+        </div>
+
+        <button
+          className="mobile-theme-btn"
+          onClick={toggleTheme}
+          title={theme === 'light' ? 'Chuyển chế độ tối' : 'Chuyển chế độ sáng'}
+        >
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
+      </header>
+
       {/* Desktop Sidebar */}
       <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
         <NavLink to="/" className="sidebar-logo">
@@ -119,20 +163,10 @@ export default function Sidebar() {
 
       <InstallButton variant="mobile" />
 
-      {/* Mobile floating theme toggle */}
-      <button
-        className="mobile-theme-toggle"
-        onClick={toggleTheme}
-        title={theme === 'light' ? 'Chuyển chế độ tối' : 'Chuyển chế độ sáng'}
-        aria-label="Đổi sáng/tối"
-      >
-        {theme === 'light' ? '🌙' : '☀️'}
-      </button>
-
       {/* Mobile Nav */}
       <nav className="mobile-nav">
         <div className="mobile-nav-items">
-          {visibleNavItems.slice(0, 5).map(item => (
+          {mobileItems.map(item => (
             <NavLink
               key={item.to}
               to={item.to}

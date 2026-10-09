@@ -390,6 +390,11 @@ body::before {
     backdrop-filter: blur(10px);
   }
 
+  /* Add safe area padding to main content on mobile */
+  .main-content {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
   .mobile-logo {
     display: flex;
     align-items: center;
@@ -489,41 +494,84 @@ body::before {
 .mobile-nav {
   display: none;
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--bg-secondary);
-  border-top: 1px solid var(--border-color);
-  padding: 5px var(--space-sm);
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 24px);
+  max-width: 420px;
+  background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+  border-radius: 24px;
+  padding: 8px;
   z-index: 100;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.18),
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
 .mobile-nav-items {
   display: flex;
   justify-content: space-around;
   align-items: center;
+  position: relative;
 }
 
 .mobile-nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
+  justify-content: center;
+  gap: 2px;
   text-decoration: none;
-  color: var(--text-secondary);
-  font-size: 0.6rem;
-  transition: all var(--transition-normal);
-  padding: 3px 8px;
-  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 6px 10px;
+  border-radius: 16px;
+  min-width: 56px;
+  position: relative;
+}
+
+.mobile-nav-item span:first-child {
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mobile-nav-item:active span:first-child {
+  transform: scale(0.85);
 }
 
 .mobile-nav-item.active {
   color: var(--accent-primary);
+  background: color-mix(in srgb, var(--accent-primary) 14%, transparent);
 }
 
-.mobile-nav-item span:first-child {
-  font-size: 1.15rem;
-  line-height: 1;
+.mobile-nav-item.active span:first-child {
+  transform: scale(1.1);
+  filter: drop-shadow(0 2px 4px color-mix(in srgb, var(--accent-primary) 40%, transparent));
+}
+
+.mobile-nav-item .nav-badge {
+  position: absolute;
+  top: -2px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--gradient-hero);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--accent-primary) 40%, transparent);
 }
 
 /* Mobile-only floating theme toggle (hidden on desktop) */
@@ -535,7 +583,11 @@ body::before {
   .sidebar { display: none; }
   .mobile-nav { display: block; }
   .mobile-theme-toggle { display: flex; }
+  .mobile-install { display: inline-flex; }
 }
+
+/* Hide mobile-install on desktop */
+.mobile-install { display: none; }
 
 /* ============================================
    CARDS
@@ -1782,6 +1834,37 @@ body::before {
   color: var(--text-primary);
 }
 
+/* Mobile install button - floating action button style */
+.mobile-install {
+  display: none;
+  position: fixed;
+  bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+  right: 16px;
+  z-index: 95;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--gradient-hero);
+  color: white;
+  border: none;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 0.82rem;
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent-primary) 40%, transparent);
+  cursor: pointer;
+  animation: fabFloat 3s ease-in-out infinite;
+}
+
+@keyframes fabFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.mobile-install:active {
+  transform: scale(0.95);
+}
+
 .home-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
@@ -2687,6 +2770,69 @@ body::before {
     height: 46px;
     font-size: 1.05rem;
   }
+
+  /* Page header on mobile */
+  .page-title {
+    font-size: clamp(1.4rem, 6vw, 1.8rem);
+  }
+  .page-subtitle {
+    font-size: 0.85rem;
+  }
+
+  /* Cards on mobile - softer radius, less padding */
+  .card {
+    border-radius: 18px;
+    padding: 16px;
+  }
+
+  /* Buttons on mobile - bigger touch targets */
+  .btn {
+    min-height: 44px;
+    font-size: 0.9rem;
+  }
+  .btn-lg {
+    min-height: 52px;
+    font-size: 1rem;
+  }
+
+  /* Quiz options - bigger & tappable */
+  .quiz-option {
+    padding: 14px 16px;
+    font-size: 0.95rem;
+    min-height: 52px;
+  }
+
+  /* Hero/feature cards on home */
+  .feature-card,
+  .home-feature,
+  [class*="hero"] {
+    padding: 16px !important;
+  }
+
+  /* Typography scale on mobile */
+  h1 { font-size: clamp(1.4rem, 6vw, 1.8rem); }
+  h2 { font-size: clamp(1.15rem, 5vw, 1.4rem); }
+  h3 { font-size: clamp(1rem, 4.5vw, 1.2rem); }
+
+  /* Tables/grids collapse */
+  .grid-2, .grid-3, .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Better touch feedback */
+  button, .btn, [role="button"] {
+    -webkit-tap-highlight-color: rgba(99, 102, 241, 0.15);
+  }
+
+  /* Prevent horizontal scroll on landscape phone */
+  body, html { overscroll-behavior-x: none; }
+
+  /* Mobile completion screen - bigger emoji */
+  .completion-emoji { font-size: 4.5rem; }
+  .completion-title { font-size: 1.5rem; }
+
+  /* Badge smaller on mobile */
+  .badge { font-size: 0.7rem; padding: 3px 8px; }
 }
 
 /* ============================================

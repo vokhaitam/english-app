@@ -128,42 +128,70 @@ export default function StudyPage() {
   if (!selectedTopic && !level && !inDeck && !inStarred) {
     const totalWords = topics.reduce((sum, t) => sum + (vocabulary[t.id]?.length || 0), 0);
     return (
-      <div className="fade-in">
-        <div className="page-header">
-          <h1 className="page-title">📚 Học từ vựng</h1>
-          <p className="page-subtitle">Chọn cấp độ từ vựng phù hợp với bạn</p>
+      <div className="study-page fade-in">
+        {/* Hero header lung linh */}
+        <div className="study-hero">
+          <div className="study-hero-blob study-hero-blob-1" />
+          <div className="study-hero-blob study-hero-blob-2" />
+          <div className="study-hero-blob study-hero-blob-3" />
+          <div className="study-hero-eyebrow">
+            <span className="study-hero-eyebrow-dot" />
+            THƯ VIỆN TỪ VỰNG
+          </div>
+          <h1 className="study-hero-title">
+            Học từ vựng <span className="study-hero-title-accent">thông minh</span>
+          </h1>
+          <p className="study-hero-desc">
+            Chọn cấp độ phù hợp — từ cơ bản đến nâng cao.
+            Hơn <strong>{totalWords.toLocaleString('vi-VN')}</strong> từ đang chờ bạn khám phá.
+          </p>
+
+          {/* Stats mini */}
+          <div className="study-hero-stats">
+            <div className="study-hero-stat">
+              <span className="study-hero-stat-num">{levels.length}</span>
+              <span className="study-hero-stat-label">Cấp độ</span>
+            </div>
+            <div className="study-hero-stat-divider" />
+            <div className="study-hero-stat">
+              <span className="study-hero-stat-num">{topics.length}</span>
+              <span className="study-hero-stat-label">Chủ đề</span>
+            </div>
+            <div className="study-hero-stat-divider" />
+            <div className="study-hero-stat">
+              <span className="study-hero-stat-num">{totalWords.toLocaleString('vi-VN')}</span>
+              <span className="study-hero-stat-label">Từ vựng</span>
+            </div>
+          </div>
         </div>
 
-        <div style={{ marginBottom: '24px' }}>
-          <div style={{ position: 'relative' }}>
+        {/* Search bar */}
+        <div className="study-search-wrap">
+          <div className="study-search">
+            <span className="study-search-icon">🔍</span>
             <input
               type="text"
-              className="search-input"
-              placeholder="🔍 Tìm từ vựng (tiếng Anh hoặc tiếng Việt)..."
+              className="study-search-input"
+              placeholder="Tìm từ vựng (tiếng Anh hoặc tiếng Việt)..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
             {searchQuery.trim() && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="search-clear"
+                className="study-search-clear"
                 aria-label="Xóa tìm kiếm"
               >
                 ✕
               </button>
             )}
           </div>
+        </div>
 
+        <div style={{ marginBottom: '24px' }}>
           {searchQuery.trim() ? (
             <div className="search-results fade-in">
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                margin: '16px 0 12px',
-                fontSize: '0.9rem',
-                color: 'var(--text-muted)',
-              }}>
+              <div className="search-results-header">
                 <span>
                   {searchResults.length === 0
                     ? `Không tìm thấy từ "${searchQuery}"`
@@ -220,67 +248,89 @@ export default function StudyPage() {
               )}
             </div>
           ) : (
-            <div className="topic-grid">
-              {levels.map(lvl => {
-                const lvlTopics = topics.filter(t => t.level === lvl.id);
-                const lvlWords = lvlTopics.reduce((sum, t) => sum + (vocabulary[t.id]?.length || 0), 0);
-                return (
-                  <div
-                    key={lvl.id}
-                    className="topic-card"
-                    style={{ '--topic-gradient': `linear-gradient(135deg, ${lvl.color}, ${lvl.color}cc)` }}
-                    onClick={() => selectLevel(lvl.id)}
-                  >
-                    <div style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: '3px',
-                      background: `linear-gradient(135deg, ${lvl.color}, ${lvl.color}cc)`,
-                      borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
-                    }} />
-                    <div className="topic-icon">{lvl.icon}</div>
-                    <div className="topic-name">{lvl.label}</div>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                      {lvl.desc}
+            <>
+              {/* Section label */}
+              <div className="study-section-label">
+                <span className="study-section-label-icon">🎯</span>
+                <span>Chọn cấp độ của bạn</span>
+              </div>
+
+              <div className="study-level-grid">
+                {levels.map((lvl, idx) => {
+                  const lvlTopics = topics.filter(t => t.level === lvl.id);
+                  const lvlWords = lvlTopics.reduce((sum, t) => sum + (vocabulary[t.id]?.length || 0), 0);
+                  return (
+                    <div
+                      key={lvl.id}
+                      className="study-level-card"
+                      style={{
+                        '--level-color': lvl.color,
+                        '--level-gradient': `linear-gradient(135deg, ${lvl.color}, ${lvl.color}cc)`,
+                        animationDelay: `${idx * 0.07}s`,
+                      }}
+                      onClick={() => selectLevel(lvl.id)}
+                    >
+                      <div className="study-level-card-glow" />
+                      <div className="study-level-card-content">
+                        <div className="study-level-icon-wrap">
+                          <div className="study-level-icon">{lvl.icon}</div>
+                        </div>
+                        <div className="study-level-name">{lvl.label}</div>
+                        <div className="study-level-desc">{lvl.desc}</div>
+                        <div className="study-level-divider" />
+                        <div className="study-level-meta">
+                          <div className="study-level-meta-item">
+                            <span className="study-level-meta-num">{lvlTopics.length}</span>
+                            <span className="study-level-meta-label">chủ đề</span>
+                          </div>
+                          <div className="study-level-meta-item">
+                            <span className="study-level-meta-num">{lvlWords}</span>
+                            <span className="study-level-meta-label">từ</span>
+                          </div>
+                        </div>
+                        <div className="study-level-cta">
+                          Bắt đầu học <span>→</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="topic-count">
-                      {lvlTopics.length} chủ đề • {lvlWords} từ vựng
+                  );
+                })}
+
+                {/* Card đặc biệt - Đã đánh dấu */}
+                <div
+                  className="study-level-card study-level-card-starred"
+                  style={{ animationDelay: `${levels.length * 0.07}s` }}
+                  onClick={() => setSearchParams({ starred: '1' })}
+                >
+                  <div className="study-level-card-glow" />
+                  <div className="study-level-card-content">
+                    <div className="study-level-icon-wrap study-level-icon-wrap-starred">
+                      <div className="study-level-icon">⭐</div>
+                    </div>
+                    <div className="study-level-name">Đã đánh dấu</div>
+                    <div className="study-level-desc">Ôn lại những từ bạn đã lưu yêu thích</div>
+                    <div className="study-level-divider" />
+                    <div className="study-level-meta">
+                      <div className="study-level-meta-item">
+                        <span className="study-level-meta-num">{starredList.length}</span>
+                        <span className="study-level-meta-label">từ yêu thích</span>
+                      </div>
+                    </div>
+                    <div className="study-level-cta">
+                      Ôn ngay <span>→</span>
                     </div>
                   </div>
-                );
-              })}
-              <div
-                className="topic-card"
-                style={{ '--topic-gradient': 'linear-gradient(135deg, #f5a623, #ffce73)' }}
-                onClick={() => setSearchParams({ starred: '1' })}
-              >
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '3px',
-                  background: 'linear-gradient(135deg, #f5a623, #ffce73)',
-                  borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
-                }} />
-                <div className="topic-icon">⭐</div>
-                <div className="topic-name">Đã đánh dấu</div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                  Ôn lại những từ bạn đã lưu yêu thích
-                </div>
-                <div className="topic-count">
-                  {starredList.length} từ
                 </div>
               </div>
-            </div>
+            </>
           )}
         </div>
+
         {!searchQuery.trim() && (
-          <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '16px' }}>
-            Tổng cộng {topics.length} chủ đề • {totalWords} từ vựng
-          </p>
+          <div className="study-footer-summary">
+            <span className="study-footer-summary-dot" />
+            Tổng cộng <strong>{topics.length}</strong> chủ đề · <strong>{totalWords.toLocaleString('vi-VN')}</strong> từ vựng
+          </div>
         )}
       </div>
     );

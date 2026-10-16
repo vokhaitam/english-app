@@ -4,6 +4,8 @@ import { AppProvider, useApp } from './context/AppContext';
 import { LanguageProvider } from './context/LanguageContext';
 import Sidebar from './components/Sidebar';
 import Mascot from './components/Mascot';
+import SeasonEffect from './components/SeasonEffect';
+import SeasonDecor from './components/SeasonDecor';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const StudyPage = lazy(() => import('./pages/StudyPage'));
@@ -61,6 +63,8 @@ function App() {
       <AppProvider>
         <Router>
           <div className="app-layout">
+            <SeasonEffect />
+            <SeasonDecor />
             <Sidebar />
             <main className="main-content">
               <Suspense fallback={<PageLoader />}>

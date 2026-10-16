@@ -1,21 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { speak } from '../lib/speech';
 
 export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, isStarred, onToggleStar, cardIndex, total }) {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [animKey, setAnimKey] = useState(0);
   const [direction, setDirection] = useState('next');
-  const [prevWord, setPrevWord] = useState(word);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const prevWordRef = useRef(word);
 
-  // Reset flip/card state when the card changes (derived state pattern)
-  if (word !== prevWord) {
-    setPrevWord(word);
-    setIsFlipped(false);
-    setIsAnimating(false);
-  }
+  // Reset flip state when card changes
+  useEffect(() => {
+    if (word !== prevWordRef.current) {
+      prevWordRef.current = word;
+      setIsFlipped(false);
+    }
+  }, [word]);
 
   const handleFlip = () => {
-    setIsFlipped(f => !f);
+    if (!isTransitioning) setIsFlipped(f => !f);
   };
 
   const handleSpeak = (e) => {
@@ -26,102 +28,113 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
   const reading = word.reading && word.reading !== word.word ? word.reading : '';
   const pronunciation = word.pronunciation || word.romaji || '';
 
+  const animateAndAct = (callback, dir = 'next') => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setDirection(dir);
+    setAnimKey(k => k + 1);
+    
+    // Animation duration: 350ms
+    setTimeout(() => {
+      callback();
+      setIsTransitioning(false);
+    }, 320);
+  };
+
   const handleKnow = (e) => {
     e.stopPropagation();
-    setDirection('next');
-    setIsAnimating(true);
-    setTimeout(() => {
-      setIsAnimating(false);
-      onKnow();
-    }, 260);
+    animateAndAct(onKnow, 'next');
   };
 
   const handleDontKnow = (e) => {
     e.stopPropagation();
-    setDirection('next');
-    setIsAnimating(true);
-    setTimeout(() => {
-      setIsAnimating(false);
-      onDontKnow();
-    }, 260);
+    animateAndAct(onDontKnow, 'next');
   };
 
   const handlePrev = (e) => {
     e.stopPropagation();
+    if (isTransitioning) return;
+    setIsTransitioning(true);
     setDirection('prev');
-    onPrev();
+    setAnimKey(k => k + 1);
+    setTimeout(() => {
+      onPrev();
+      setIsTransitioning(false);
+    }, 350);
   };
 
   const handleNext = (e) => {
     e.stopPropagation();
+    if (isTransitioning) return;
+    setIsTransitioning(true);
     setDirection('next');
-    onNext();
+    setAnimKey(k => k + 1);
+    setTimeout(() => {
+      onNext();
+      setIsTransitioning(false);
+    }, 350);
   };
 
+  const progressPercent = ((cardIndex + 1) / total) * 100;
+
   return (
-    <div className="fade-in">
+    <div className="flashcard-container">
       {/* Progress */}
-      <div style={{ marginBottom: '20px' }}>
-        <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
-          <span className="text-secondary" style={{ fontSize: '0.85rem' }}>
-            Thẻ {cardIndex + 1} / {total}
-          </span>
-          <span className="badge badge-purple">
-            {Math.round(((cardIndex + 1) / total) * 100)}%
-          </span>
+      <div className="flashcard-progress">
+        <div className="flashcard-progress-info">
+          <span className="flashcard-progress-label">Thẻ {cardIndex + 1} / {total}</span>
+          <span className="flashcard-progress-percent">{Math.round(progressPercent)}%</span>
         </div>
-        <div className="progress-bar-container">
-          <div
-            className="progress-bar-fill"
-            style={{ width: `${((cardIndex + 1) / total) * 100}%` }}
+        <div className="flashcard-progress-bar">
+          <div 
+            className="flashcard-progress-fill" 
+            style={{ width: `${progressPercent}%` }}
           />
         </div>
       </div>
 
-      {/* Card */}
+      {/* Card with animation */}
       <div className="flashcard-card-3d">
         <div
-          key={`${direction}-${word.id}`}
-          className={`flashcard-scene ${direction === 'prev' ? 'flashcard-enter-left' : 'flashcard-enter-right'}`}
+          key={animKey}
+          className={`flashcard-scene ${direction === 'prev' ? 'slide-from-left' : 'slide-from-right'} ${isTransitioning ? 'is-animating' : ''}`}
         >
           <div
-            className="flashcard-shift"
-            style={{
-              opacity: isAnimating ? 0.4 : 1,
-              transition: 'opacity 0.25s ease',
-              transform: isAnimating ? (direction === 'next' ? 'translateX(-40px)' : 'translateX(40px)') : 'none',
-            }}
+            className={`flashcard-wrapper ${isFlipped ? 'flipped' : ''}`}
+            onClick={handleFlip}
           >
-            <div
-              className={`flashcard-wrapper ${isFlipped ? 'flipped' : ''}`}
-              onClick={handleFlip}
-              style={{ minHeight: '260px' }}
-            >
-              {/* Front */}
-              <div className="flashcard-face flashcard-front">
-                <span className="card-hint">Nhấn để xem nghĩa 👆</span>
-                {word.type && (
-                  <span className="card-type-badge">
-                    <span className="badge badge-purple">{word.type}</span>
-                  </span>
-                )}
-                <div className="flashcard-clip">
-                  <div className="card-word">{word.word}</div>
-                  {reading && <div className="card-reading">{reading}</div>}
-                  {pronunciation && <div className="card-pronunciation">{pronunciation}</div>}
-                </div>
+            {/* Front */}
+            <div className="flashcard-face flashcard-front">
+              <span className="card-hint">👆 Nhấn để xem nghĩa</span>
+              {word.type && (
+                <span className="card-type-badge">
+                  <span className="badge badge-purple">{word.type}</span>
+                </span>
+              )}
+              <div className="flashcard-clip">
+                <div className="card-word">{word.word}</div>
+                {reading && <div className="card-reading">{reading}</div>}
+                {pronunciation && <div className="card-pronunciation">{pronunciation}</div>}
               </div>
+              <div className="card-flip-hint">
+                <span>Lật thẻ</span>
+              </div>
+            </div>
 
-              {/* Back */}
-              <div className="flashcard-face flashcard-back">
-                <span className="card-hint">✅ Nghĩa của từ</span>
-                <div className="flashcard-clip">
-                  <div className="card-meaning">{word.meaning}</div>
+            {/* Back */}
+            <div className="flashcard-face flashcard-back">
+              <span className="card-hint">✅ Nghĩa của từ</span>
+              <div className="flashcard-clip">
+                <div className="card-meaning">{word.meaning}</div>
+                {word.example && (
                   <div className="card-example">"{word.example}"</div>
-                  {word.exampleMeaning && (
-                    <div className="card-example-meaning">{word.exampleMeaning}</div>
-                  )}
-                </div>
+                )}
+                {word.exampleMeaning && (
+                  <div className="card-example-meaning">{word.exampleMeaning}</div>
+                )}
+              </div>
+              <div className="card-flip-hint">
+                <span>Lật lại</span>
               </div>
             </div>
           </div>
@@ -129,17 +142,18 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
       </div>
 
       {/* Controls */}
-      <div className="flashcard-controls" style={{ marginTop: '24px' }}>
+      <div className="flashcard-controls">
         <button
           className="control-btn dont-know"
           onClick={handleDontKnow}
           title="Chưa biết"
         >
-          ❌
+          <span className="control-btn-icon">❌</span>
+          <span className="control-btn-label">Chưa biết</span>
         </button>
 
         <button
-          className="control-btn"
+          className="control-btn nav-btn"
           onClick={handlePrev}
           title="Thẻ trước"
         >
@@ -163,7 +177,7 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
         </button>
 
         <button
-          className="control-btn"
+          className="control-btn nav-btn"
           onClick={handleNext}
           title="Thẻ tiếp"
         >
@@ -175,19 +189,16 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
           onClick={handleKnow}
           title="Đã biết"
         >
-          ✅
+          <span className="control-btn-icon">✅</span>
+          <span className="control-btn-label">Đã biết</span>
         </button>
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-md" style={{ marginTop: '16px' }}>
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          ❌ Chưa biết
-        </span>
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>•</span>
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          ✅ Đã biết
-        </span>
+      <div className="flashcard-legend">
+        <span>❌ Chưa biết</span>
+        <span className="flashcard-legend-dot">•</span>
+        <span>✅ Đã biết</span>
       </div>
     </div>
   );

@@ -21,9 +21,32 @@ function load(key, fallback) {
   }
 }
 
+// Các map lưu theo khoá từ vựng (cần namespace ngôn ngữ) — dùng để migrate dữ liệu cũ.
+const WORD_KEYED_MAPS = new Set(['knownWords', 'starredWords', 'reviewItems', 'mistakes']);
+
 export function AppProvider({ children }) {
   const { lang } = useLanguage();
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  // Mùa hiện tại: 'spring' | 'summer' | 'autumn' | 'winter' | 'auto' (theo tháng)
+  const [seasonPref, setSeasonPref] = useState(() => localStorage.getItem('seasonPref') || 'auto');
+
+  // Hàm suy ra mùa theo tháng (1-12). Xuân 3-5, Hạ 6-8, Thu 9-11, Đông 12-2.
+  const getSeasonByMonth = (monthIndex) => {
+    if (monthIndex >= 2 && monthIndex <= 4) return 'spring';
+    if (monthIndex >= 5 && monthIndex <= 7) return 'summer';
+    if (monthIndex >= 8 && monthIndex <= 10) return 'autumn';
+    return 'winter';
+  };
+
+  // season tự động cập nhật theo tháng hiện tại (recalculate mỗi 60s để catch đổi tháng)
+  const [seasonTimestamp, setSeasonTimestamp] = useState(Date.now());
+  useEffect(() => {
+    const interval = setInterval(() => setSeasonTimestamp(Date.now()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+  const currentSeason = seasonPref === 'auto'
+    ? getSeasonByMonth(new Date().getMonth())
+    : seasonPref;
   // Khoá cũ chưa có namespace thì mặc định là tiếng Anh.
   const [knownWords, setKnownWords] = useState(() => migrateLegacyObject(load('knownWords', {})));
   const [starredWords, setStarredWords] = useState(() => migrateLegacyObject(load('starredWords', {})));
@@ -81,7 +104,10 @@ export function AppProvider({ children }) {
           const data = await r.json();
           if (!cancelled && data && typeof data === 'object') {
             Object.keys(data).forEach(k => {
-              if (settersRef.current[k]) settersRef.current[k](data[k]);
+              if (!settersRef.current[k]) return;
+              // Dữ liệu cũ trên server có thể chưa có namespace ngôn ngữ — migrate giống localStorage.
+              const value = WORD_KEYED_MAPS.has(k) ? migrateLegacyObject(data[k]) : data[k];
+              settersRef.current[k](value);
             });
           }
         }
@@ -109,6 +135,11 @@ export function AppProvider({ children }) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-season', currentSeason);
+    localStorage.setItem('seasonPref', seasonPref);
+  }, [currentSeason, seasonPref]);
 
   // debounced API sync
   useEffect(() => {
@@ -352,6 +383,7 @@ export function AppProvider({ children }) {
   return (
     <AppContext.Provider value={{
       theme, toggleTheme,
+      seasonPref, setSeasonPref, currentSeason,
       knownWords, starredWords, reviewItems, mistakes,
       studyHistory, quizScores, streakDays, dailyGoal, setDailyGoal,
       dailyProgress, xp, sentencesLearned, toggleSentenceLearned,

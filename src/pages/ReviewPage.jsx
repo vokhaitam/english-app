@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { splitWordKey } from '../lib/wordKey';
 import { useApp } from '../context/AppContext';
@@ -12,8 +12,15 @@ export default function ReviewPage() {
   const [mode, setMode] = useState('review');
   const [knownCount, setKnownCount] = useState(0);
   const [dontKnowCount, setDontKnowCount] = useState(0);
+  // Từ user vừa trả lời sai — sẽ hiện lại cuối session cho đến khi trả lời đúng.
+  const [retryKeys, setRetryKeys] = useState([]);
 
-  const queue = useMemo(() => getDueReviews(), [getDueReviews]);
+  const baseQueue = useMemo(() => getDueReviews(), [getDueReviews]);
+  // Hàng đợi tổng = từ đến hạn + các từ sai sẽ ôn lại trong session.
+  const queue = useMemo(
+    () => [...baseQueue, ...retryKeys.map(k => ({ key: k, level: -1, dueAt: 0, _retry: true }))],
+    [baseQueue, retryKeys]
+  );
 
   const current = queue[queueIdx] || null;
 
@@ -21,17 +28,42 @@ export default function ReviewPage() {
     if (!current) return null;
     const parsed = splitWordKey(current.key);
     if (!parsed) return null;
+    const wordId = Number(parsed.wordId);
     const topicWords = vocabulary[parsed.topicId] || [];
-    const word = topicWords.find(w => w.id === parsed.wordId);
+    const word = topicWords.find(w => w.id === wordId);
     const topic = topics.find(t => t.id === parsed.topicId);
-    return word && topic ? { word, topic, topicId: parsed.topicId, wordId: parsed.wordId, wordKey: current.key } : null;
+    return word && topic ? { word, topic, topicId: parsed.topicId, wordId, wordKey: current.key } : null;
   }, [current, vocabulary, topics]);
 
+  // Ref theo dõi queue hiện tại để advance() luôn dùng giá trị mới nhất.
+  const queueRef = useRef(queue);
+  queueRef.current = queue;
+  const retryKeysRef = useRef(retryKeys);
+  retryKeysRef.current = retryKeys;
+
   const advance = (known) => {
-    if (known) setKnownCount(k => k + 1);
-    else setDontKnowCount(k => k + 1);
-    if (queueIdx + 1 >= queue.length) setCompleted(true);
-    else setQueueIdx(i => i + 1);
+    if (known) {
+      setKnownCount(k => k + 1);
+      // Trả lời đúng một từ retry thì bỏ khỏi hàng đợi retry.
+      if (current?._retry) {
+        setRetryKeys(prev => prev.filter(k => k !== current.key));
+      }
+    } else {
+      setDontKnowCount(k => k + 1);
+      // Sai từ nào thì thêm từ đó vào cuối queue (nếu chưa có) để hỏi lại trong session.
+      if (current && !current._retry) {
+        setRetryKeys(prev => prev.includes(current.key) ? prev : [...prev, current.key]);
+      }
+    }
+    const totalLen = queueRef.current.length;
+    if (queueIdx + 1 >= totalLen) {
+      // Hết queue gốc: nếu sắp có retry thêm vào (sai vừa rồi), quay lại đầu;
+      // nếu không còn gì thì kết thúc.
+      if (retryKeysRef.current.length > 0) setQueueIdx(0);
+      else setCompleted(true);
+    } else {
+      setQueueIdx(i => i + 1);
+    }
   };
 
   if (mode === 'review' && queue.length === 0 && !completed) {
@@ -49,7 +81,6 @@ export default function ReviewPage() {
       </div>
     );
   }
-
   if (completed) {
     const total = knownCount + dontKnowCount;
     const acc = total > 0 ? Math.round((knownCount / total) * 100) : 0;
@@ -71,7 +102,7 @@ export default function ReviewPage() {
             <div className="completion-stat-label">Đúng</div>
           </div>
         </div>
-        <button className="btn btn-primary" onClick={() => { setMode('review'); setQueueIdx(0); setKnownCount(0); setDontKnowCount(0); setCompleted(false); }}>
+        <button className="btn btn-primary" onClick={() => { setMode('review'); setQueueIdx(0); setKnownCount(0); setDontKnowCount(0); setCompleted(false); setRetryKeys([]); }}>
           🔄 Ôn lại
         </button>
       </div>
@@ -82,8 +113,11 @@ export default function ReviewPage() {
     <div className="fade-in">
       <div className="page-header">
         <div className="flex items-center gap-md" style={{ marginBottom: '8px' }}>
-          <button className="btn btn-ghost btn-sm" onClick={() => setMode('review')}>← Về đầu</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => { setMode('review'); setQueueIdx(0); setRetryKeys([]); }}>← Về đầu</button>
           <span className="badge badge-purple">Còn {queue.length - queueIdx} từ</span>
+          {retryKeys.length > 0 && (
+            <span className="badge badge-red">🔁 {retryKeys.length} từ ôn lại</span>
+          )}
         </div>
         <h1 className="page-title">🔁 Ôn tập</h1>
       </div>

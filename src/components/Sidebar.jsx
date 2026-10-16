@@ -4,24 +4,24 @@ import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import InstallButton from './InstallButton';
 
-// japaneseOnly: mục chỉ có ý nghĩa với gói Nhật.
+// Sidebar gọn — tất cả trong 1 menu
 const navItems = [
-  { to: '/', icon: '🏠', label: 'Dashboard', short: 'Trang chủ' },
-  { to: '/roadmap', icon: '🗺️', label: 'Lộ trình', short: 'Lộ trình' },
-  { to: '/study', icon: '📚', label: 'Học từ vựng', short: 'Từ vựng' },
-  { to: '/quiz', icon: '🎯', label: 'Quiz', short: 'Quiz' },
-  { to: '/kana', icon: '🔤', label: 'Bảng kana', short: 'Kana', japaneseOnly: true },
-  { to: '/grammar', icon: '📘', label: 'Ngữ pháp', short: 'Ngữ pháp' },
-  { to: '/games', icon: '🎮', label: 'Game', short: 'Game' },
-  { to: '/my-decks', icon: '🗂️', label: 'Bộ từ của tôi', short: 'Bộ từ' },
-  { to: '/grammar-practice', icon: '✍️', label: 'Luyện tập ngữ pháp', short: 'Luyện tập' },
-  { to: '/review', icon: '🔁', label: 'Ôn tập', short: 'Ôn tập' },
-  { to: '/listening', icon: '🎧', label: 'Luyện nghe', short: 'Luyện nghe' },
-  { to: '/stats', icon: '📊', label: 'Thống kê', short: 'Thống kê' },
+  { to: '/', icon: '🏠', label: 'Trang chủ' },
+  { to: '/study', icon: '📚', label: 'Học từ vựng' },
+  { to: '/roadmap', icon: '🗺️', label: 'Lộ trình' },
+  { to: '/quiz', icon: '🎯', label: 'Quiz nhanh' },
+  { to: '/review', icon: '🔁', label: 'Ôn tập' },
+  { to: '/grammar', icon: '📘', label: 'Ngữ pháp' },
+  { to: '/games', icon: '🎮', label: 'Game' },
+  { to: '/my-decks', icon: '🗂️', label: 'Bộ từ của tôi' },
+  { to: '/listening', icon: '🎧', label: 'Luyện nghe' },
+  { to: '/kana', icon: '🔤', label: 'Bảng kana', japaneseOnly: true },
+  { to: '/grammar-practice', icon: '✍️', label: 'Luyện tập' },
+  { to: '/stats', icon: '📊', label: 'Thống kê' },
 ];
 
 export default function Sidebar() {
-  const { getReviewCount, theme, toggleTheme, getLevel, xp } = useApp();
+  const { getReviewCount, theme, toggleTheme, getLevel, xp, setSeasonPref, currentSeason } = useApp();
   const { lang, languages, selectLanguage, pack } = useLanguage();
   const dueCount = getReviewCount();
   const visibleNavItems = navItems.filter(i => !i.japaneseOnly || lang === 'ja');
@@ -32,7 +32,7 @@ export default function Sidebar() {
     localStorage.setItem('sidebar-collapsed', collapsed ? '1' : '0');
   }, [collapsed]);
 
-  const mobileItems = visibleNavItems.slice(0, 5);
+  const mobileItems = visibleNavItems.slice(0, 6);
 
   return (
     <>
@@ -143,6 +143,27 @@ export default function Sidebar() {
             </div>
           </div>
 
+          <div className="season-picker">
+            <span className="season-picker-label">Mùa</span>
+            <div className="season-options">
+              {[
+                { id: 'spring', label: 'Xuân', icon: '🌸' },
+                { id: 'summer', label: 'Hạ', icon: '☀️' },
+                { id: 'autumn', label: 'Thu', icon: '🍂' },
+                { id: 'winter', label: 'Đông', icon: '❄️' },
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  className={`season-option ${currentSeason === opt.id ? 'active' : ''}`}
+                  onClick={() => setSeasonPref(opt.id)}
+                  title={opt.label}
+                >
+                  <span>{opt.icon}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button className="theme-toggle" onClick={toggleTheme} title="Đổi sáng / tối">
             <span>{theme === 'light' ? '🌙' : '☀️'}</span>
             <span className="theme-toggle-label">{theme === 'light' ? 'Chế độ tối' : 'Chế độ sáng'}</span>
@@ -176,7 +197,7 @@ export default function Sidebar() {
               }
             >
               <span>{item.icon}</span>
-              <span>{item.short}</span>
+              <span>{item.label}</span>
             </NavLink>
           ))}
         </div>

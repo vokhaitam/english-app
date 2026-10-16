@@ -18,7 +18,7 @@ const TYPE_LABELS = {
 };
 
 export default function StudyPage() {
-  const { vocabulary, topics, levels, getAllWords, lang } = useLanguage();
+  const { vocabulary, topics, levels, getAllWords, lang, pack } = useLanguage();
   const { markKnown, markUnknown, isStarred, toggleStar, customDecks, starredWords } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
   const level = searchParams.get('level');
@@ -172,7 +172,7 @@ export default function StudyPage() {
             <input
               type="text"
               className="study-search-input"
-              placeholder="Tìm từ vựng (tiếng Anh hoặc tiếng Việt)..."
+              placeholder={`Tìm từ vựng (${pack.otherLanguageHint})...`}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
@@ -243,7 +243,7 @@ export default function StudyPage() {
 
               {searchResults.length === 0 && (
                 <div className="search-results-empty">
-                  Thử từ khóa khác (tiếng Anh hoặc tiếng Việt) nhé
+                  Thử từ khóa khác ({pack.otherLanguageHint}) nhé
                 </div>
               )}
             </div>

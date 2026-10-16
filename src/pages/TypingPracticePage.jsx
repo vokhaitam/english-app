@@ -102,6 +102,12 @@ export default function TypingPracticePage() {
     if (phase === 'playing') inputRef.current?.focus();
   }, [phase, idx]);
 
+  useEffect(() => {
+    if (phase === 'playing' && feedback) {
+      inputRef.current?.focus();
+    }
+  }, [phase, feedback]);
+
   const start = (tid) => {
     setTopicId(tid);
     setPool(shuffleArray(buildPool(tid, vocabulary)));
@@ -128,11 +134,13 @@ export default function TypingPracticePage() {
       setCorrect(c => c + 1);
       setFeedback({ ok: true });
       speak(current.word, 0.9);
+      setTimeout(() => inputRef.current?.focus(), 0);
     } else {
       markUnknown(current.topicId, current.id);
       setWrong(w => w + 1);
       setFeedback({ ok: false });
       if (dir === 'en2vi') speak(current.word, 0.9);
+      setTimeout(() => inputRef.current?.focus(), 0);
     }
   };
 
@@ -149,8 +157,12 @@ export default function TypingPracticePage() {
   const handleKey = (e) => {
     if (e.key !== 'Enter') return;
     e.preventDefault();
-    if (feedback) next();
-    else submit();
+    if (feedback) {
+      next();
+      setTimeout(() => inputRef.current?.focus(), 0);
+      return;
+    }
+    submit();
   };
 
   // ---- TOPIC SELECT ----
@@ -336,6 +348,7 @@ export default function TypingPracticePage() {
             <div className="tp-feedback ok">
               Đúng rồi! 🎉
               {returning && <div className="tp-reveal">{current.meaning}</div>}
+              <div className="tp-hint">Nhấn Enter để tiếp tục</div>
             </div>
           )}
 
@@ -347,6 +360,7 @@ export default function TypingPracticePage() {
                   ? <>Nghĩa đúng: <strong>{current.meaning}</strong></>
                   : <>Từ đúng: <strong>{current.word}</strong> {pron}</>}
               </div>
+              <div className="tp-hint">Nhấn Enter để tiếp tục</div>
             </div>
           )}
         </div>
@@ -360,7 +374,7 @@ export default function TypingPracticePage() {
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKey}
             placeholder={returning ? 'Gõ nghĩa tiếng Việt...' : `Gõ từ ${isJapanese ? 'tiếng Nhật (romaji/kana)...' : 'tiếng Anh...'}`}
-            disabled={!!feedback}
+            readOnly={!!feedback}
             spellCheck={false}
             autoComplete="off"
             autoCorrect="off"

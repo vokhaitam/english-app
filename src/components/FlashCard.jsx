@@ -75,6 +75,30 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
     }, 350);
   };
 
+  // Phím tắt: Space = lật thẻ, Enter = Đã biết
+  useEffect(() => {
+    const onKey = (e) => {
+      const el = document.activeElement;
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+      if (e.code === 'Space' || e.key === ' ') {
+        e.preventDefault();
+        if (!isTransitioning) setIsFlipped(f => !f);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (isTransitioning) return;
+        setIsTransitioning(true);
+        setDirection('next');
+        setAnimKey(k => k + 1);
+        setTimeout(() => {
+          onKnow();
+          setIsTransitioning(false);
+        }, 320);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isTransitioning, onKnow]);
+
   const progressPercent = ((cardIndex + 1) / total) * 100;
 
   return (
@@ -82,7 +106,7 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
       {/* Progress */}
       <div className="flashcard-progress">
         <div className="flashcard-progress-info">
-          <span className="flashcard-progress-label">Thẻ {cardIndex + 1} / {total}</span>
+          <span className="flashcard-progress-label">Thẻ {cardIndex + 1}/{total}</span>
           <span className="flashcard-progress-percent">{Math.round(progressPercent)}%</span>
         </div>
         <div className="flashcard-progress-bar">
@@ -199,6 +223,8 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
         <span>❌ Chưa biết</span>
         <span className="flashcard-legend-dot">•</span>
         <span>✅ Đã biết</span>
+        <span className="flashcard-legend-dot">•</span>
+        <span>Space lật thẻ · Enter đã biết</span>
       </div>
     </div>
   );

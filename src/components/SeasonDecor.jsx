@@ -1,10 +1,11 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
+import MapleLeaf from './MapleLeaf';
 
 const DECOR = {
   spring: [['🌷', '🌸'], ['🦋', '🌸'], ['🌱', '🌸'], ['🌸', '🦋']],
   summer: [['🌻', '☀️'], ['🌊', '🐚'], ['🍉', '🌴'], ['⛱️', '🌊']],
-  autumn: [['🍁', '🍄'], ['🌰', '🍁'], ['🎃', '🍁'], ['🍁', '🌰']],
+  autumn: [['leaf', '🍄'], ['🌰', 'leaf'], ['🎃', 'leaf'], ['leaf', '🌰']],
   winter: [['⛄', '❄️'], ['🎄', '❄️'], ['🧣', '⛄'], ['❄️', '🎁']],
 };
 
@@ -24,7 +25,7 @@ export default function SeasonDecor() {
               className="season-decor-emoji"
               style={{ animationDelay: `${(i + j) * 0.4}s` }}
             >
-              {emoji}
+              {emoji === 'leaf' ? <MapleLeaf size={24} className="season-decor-leaf" /> : emoji}
             </span>
           ))}
         </div>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { speak } from '../lib/speech';
 
 const POS_KEY = 'mascot-pos';
 
@@ -99,6 +100,7 @@ function Mascot() {
       dragRef.current.moved = false;
       return;
     }
+    speak('I love you', 1.0);
     excitedRef.current = true;
     setExciting(true);
     clearTimeout(exciteTimer.current);
@@ -115,7 +117,7 @@ function Mascot() {
       type="button"
       className={`mascot-3d ${exciting ? 'mascot-excited' : ''} ${dragging ? 'mascot-dragging' : ''}`}
       ref={wrapRef}
-      title="Yuki — kéo để di chuyển, bấm để chọc, nhấn M ẩn/hiện"
+      title="Yuki — kéo để di chuyển, bấm để nghe 'I love you', nhấn M ẩn/hiện"
       style={{ transform: `translate(${pos.x}px, ${pos.y}px)` }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

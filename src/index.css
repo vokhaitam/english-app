@@ -2379,6 +2379,17 @@ body::before {
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
+.season-effect[data-season="autumn"] .season-particle {
+  color: #e8710a;
+}
+
+/* Lá phong (dùng PNG Flaticon làm mask để đổi màu được) */
+.maple-leaf {
+  display: inline-block;
+  background-color: currentColor;
+  -webkit-mask: url('./assets/maple-leaf.png') center / contain no-repeat;
+  mask: url('./assets/maple-leaf.png') center / contain no-repeat;
+}
 @keyframes season-fall {
   0% {
     transform: translate3d(0, -10vh, 0) rotate(0deg);
@@ -2413,6 +2424,9 @@ body.sidebar-collapsed { --sidebar-w: 78px; }
 .season-decor-emoji {
   display: inline-block;
   animation: season-decor-float 5s ease-in-out infinite;
+}
+.season-decor[data-season="autumn"] .season-decor-leaf {
+  color: #e8710a;
 }
 .season-decor-tl { top: 14px; left: calc(var(--sidebar-w, 240px) + 18px); }
 .season-decor-tr { top: 14px; right: 18px; }
@@ -2530,6 +2544,8 @@ body.sidebar-collapsed { --sidebar-w: 78px; }
   padding: 0;
   background: transparent;
   cursor: pointer;
+  outline: none;
+  border: none;
   z-index: 9999;
   -webkit-tap-highlight-color: transparent;
   filter: drop-shadow(0 8px 18px rgba(230, 80, 130, 0.3));

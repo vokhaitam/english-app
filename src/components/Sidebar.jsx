@@ -26,6 +26,12 @@ export default function Sidebar() {
   const dueCount = getReviewCount();
   const visibleNavItems = navItems.filter(i => !i.japaneseOnly || lang === 'ja');
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem('sidebar-collapsed') === '1');
+  const seasons = [
+    { id: 'spring', label: 'Xuân', icon: '🌸' },
+    { id: 'summer', label: 'Hạ', icon: '☀️' },
+    { id: 'autumn', label: 'Thu', icon: '🍂' },
+    { id: 'winter', label: 'Đông', icon: '❄️' },
+  ];
 
   useEffect(() => {
     document.body.classList.toggle('sidebar-collapsed', collapsed);
@@ -68,6 +74,24 @@ export default function Sidebar() {
             </button>
           ))}
         </div>
+
+        <label className="mobile-season-control" title="Đổi hiệu ứng theo mùa">
+          <span aria-hidden="true">
+            {seasons.find(season => season.id === currentSeason)?.icon || '🌸'}
+          </span>
+          <select
+            className="mobile-season-select"
+            value={currentSeason}
+            onChange={event => setSeasonPref(event.target.value)}
+            aria-label="Đổi hiệu ứng theo mùa"
+          >
+            {seasons.map(season => (
+              <option key={season.id} value={season.id}>
+                {season.icon} {season.label}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <button
           className="mobile-theme-btn"
@@ -146,12 +170,7 @@ export default function Sidebar() {
           <div className="season-picker">
             <span className="season-picker-label">Mùa</span>
             <div className="season-options">
-              {[
-                { id: 'spring', label: 'Xuân', icon: '🌸' },
-                { id: 'summer', label: 'Hạ', icon: '☀️' },
-                { id: 'autumn', label: 'Thu', icon: '🍂' },
-                { id: 'winter', label: 'Đông', icon: '❄️' },
-              ].map(opt => (
+              {seasons.map(opt => (
                 <button
                   key={opt.id}
                   className={`season-option ${currentSeason === opt.id ? 'active' : ''}`}

@@ -75,7 +75,7 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
     }, 350);
   };
 
-  // Phím tắt: Space = lật thẻ, Enter = Đã biết
+  // Phím tắt: Space = lật thẻ, Enter = Đã biết, ←/→ = thẻ trước/tiếp
   useEffect(() => {
     const onKey = (e) => {
       const el = document.activeElement;
@@ -93,11 +93,31 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
           onKnow();
           setIsTransitioning(false);
         }, 320);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (isTransitioning) return;
+        setIsTransitioning(true);
+        setDirection('prev');
+        setAnimKey(k => k + 1);
+        setTimeout(() => {
+          onPrev();
+          setIsTransitioning(false);
+        }, 350);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (isTransitioning) return;
+        setIsTransitioning(true);
+        setDirection('next');
+        setAnimKey(k => k + 1);
+        setTimeout(() => {
+          onNext();
+          setIsTransitioning(false);
+        }, 350);
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [isTransitioning, onKnow]);
+  }, [isTransitioning, onKnow, onPrev, onNext]);
 
   const progressPercent = ((cardIndex + 1) / total) * 100;
 
@@ -112,7 +132,7 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
         <div className="flashcard-progress-bar">
           <div 
             className="flashcard-progress-fill" 
-            style={{ width: `${progressPercent}%` }}
+            style={{ width: `${Math.max(0, Math.min(100, progressPercent))}%`, transition: 'width 0.2s ease' }}
           />
         </div>
       </div>
@@ -224,7 +244,7 @@ export default function FlashCard({ word, onKnow, onDontKnow, onNext, onPrev, is
         <span className="flashcard-legend-dot">•</span>
         <span>✅ Đã biết</span>
         <span className="flashcard-legend-dot">•</span>
-        <span>Space lật thẻ · Enter đã biết</span>
+        <span>Space lật thẻ · Enter đã biết · ← → chuyển thẻ</span>
       </div>
     </div>
   );

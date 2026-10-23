@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useApp } from '../context/AppContext';
 import { useSearchParams } from 'react-router-dom';
@@ -118,6 +118,37 @@ export default function QuizPage() {
       setTimerActive(false);
     }
   };
+
+  // Phím tắt lúc làm quiz: Enter = "Câu tiếp theo", 1–4 = chọn đáp án
+  const liveRef = useRef({});
+  useEffect(() => {
+    liveRef.current = { mode, answered, questions, currentQ, handleNext, handleSelect };
+  });
+
+  useEffect(() => {
+    const onKey = (e) => {
+      const s = liveRef.current;
+      if (!s || s.mode !== 'quiz' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = document.activeElement;
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+      if (e.key === 'Enter') {
+        if (s.answered) {
+          e.preventDefault();
+          s.handleNext();
+        }
+        return;
+      }
+      if (!s.answered && /^[1-4]$/.test(e.key)) {
+        const opt = s.questions[s.currentQ]?.options[Number(e.key) - 1];
+        if (opt) {
+          e.preventDefault();
+          s.handleSelect(opt);
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const topicLabel = activeDeck
     ? `${activeDeck.icon || '🗂️'} ${activeDeck.name}`
@@ -329,6 +360,7 @@ export default function QuizPage() {
           }
           return (
             <button key={idx} className={cls} onClick={() => handleSelect(option)}>
+              <span className="quiz-option-key">{idx + 1}</span>
               {answered && option.id === correctId && '✅ '}
               {answered && selected?.id === option.id && option.id !== correctId && '❌ '}
               {shownText}

@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useApp } from '../context/AppContext';
 import { roadmaps, getRoadmap } from '../data/roadmaps';
 import { jaRoadmaps, getJaRoadmap } from '../data/ja-roadmaps';
+import { zhRoadmaps, getZhRoadmap } from '../data/zh-roadmaps';
 import Reveal from '../components/Reveal';
 
 function stageStats(stage, vocabulary, getTopicProgress) {
@@ -31,10 +32,11 @@ function roadmapStats(roadmap, vocabulary, getTopicProgress) {
 }
 
 export default function RoadmapPage() {
-  const { vocabulary, topics, isJapanese } = useLanguage();
+  const { vocabulary, topics, isJapanese, isChineseTraditional } = useLanguage();
   const { getTopicProgress } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
-  const selected = (isJapanese ? getJaRoadmap : getRoadmap)(searchParams.get('id'));
+  const getActiveRoadmap = isJapanese ? getJaRoadmap : isChineseTraditional ? getZhRoadmap : getRoadmap;
+  const selected = getActiveRoadmap(searchParams.get('id'));
 
   // ---- CHI TIẾT MỘT LỘ TRÌNH — Timeline style ----
   if (selected) {
@@ -200,7 +202,7 @@ export default function RoadmapPage() {
   }
 
   // ---- DANH SÁCH LỘ TRÌNH ----
-  const roadmapList = isJapanese ? jaRoadmaps : roadmaps;
+  const roadmapList = isJapanese ? jaRoadmaps : isChineseTraditional ? zhRoadmaps : roadmaps;
   return (
     <div className="fade-in">
       {/* Page hero */}
@@ -213,6 +215,8 @@ export default function RoadmapPage() {
           <p className="rm-list-subtitle">
             {isJapanese
               ? 'Lộ trình JLPT bài bản theo từng cấp độ N5 → N3, học có hệ thống'
+              : isChineseTraditional
+              ? 'Lộ trình HSK theo từng cấp độ 1 → 3, từ sơ cấp đến giao tiếp linh hoạt'
               : 'Lộ trình TOEIC & IELTS theo từng mốc điểm, từ vựng phân cấp rõ ràng'}
           </p>
         </div>

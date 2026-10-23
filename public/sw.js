@@ -1,5 +1,5 @@
 /* WordFlow Service Worker — cache-first for static assets, network-first for navigation */
-const CACHE_NAME = 'wordflow-v2';
+const CACHE_NAME = 'wordflow-v3';
 const PRECACHE = ['/', '/index.html', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
@@ -69,4 +69,70 @@ self.addEventListener('fetch', (event) => {
       return cached || network;
     })
   );
+});
+
+// ─── PUSH NOTIFICATIONS ───────────────────────────────────────────────────────
+
+// Nhận push event từ server (hoặc từ app client qua postMessage)
+self.addEventListener('push', (event) => {
+  let data = { title: '📚 WordFlow', body: 'Đến giờ học rồi! Học một chút nhé 🎯', icon: '/icons/icon-192.png', badge: '/icons/icon-192.png' };
+  if (event.data) {
+    try { data = { ...data, ...event.data.json() }; } catch {}
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: data.icon,
+      badge: data.badge,
+      tag: 'wordflow-study-reminder',
+      renotify: true,
+      data: { url: data.url || '/' },
+      actions: [
+        { action: 'study', title: '▶ Học ngay!' },
+        { action: 'later', title: '⏰ Nhắc sau' },
+      ],
+    })
+  );
+});
+
+// Khi click vào notification
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || '/';
+
+  if (event.action === 'later') {
+    // Snooze 30 phút — schedule lại bằng alarm API nếu có, không thì bỏ qua
+    return;
+  }
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(targetUrl);
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) return clients.openWindow(targetUrl);
+    })
+  );
+});
+
+// Lắng nghe message từ app (để app trigger notification ngay mà không cần server)
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SHOW_NOTIFICATION') {
+    const { title, body, url } = event.data;
+    self.registration.showNotification(title || '📚 WordFlow', {
+      body: body || 'Đến giờ học rồi! Học một chút nhé 🎯',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      tag: 'wordflow-study-reminder',
+      renotify: true,
+      data: { url: url || '/' },
+      actions: [
+        { action: 'study', title: '▶ Học ngay!' },
+        { action: 'later', title: '⏰ Nhắc sau' },
+      ],
+    });
+  }
 });

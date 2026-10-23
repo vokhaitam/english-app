@@ -32,14 +32,15 @@ export function LanguageProvider({ children }) {
       languages,
       selectLanguage,
       isJapanese: pack.id === 'ja',
+      isChineseTraditional: pack.id === 'zh-tw',
       // Tiện ích: các trang lấy dữ liệu qua pack thay vì import trực tiếp.
       topics: pack.topics,
       vocabulary: pack.vocabulary,
       levels: pack.levels,
       getAllWords: pack.getAllWords,
-      grammarLessons: pack.grammarLessons,
-      grammarPractice: pack.grammarPractice,
-      dailySentences: pack.dailySentences,
+      grammarLessons: pack.grammarLessons || [],
+      grammarPractice: pack.grammarPractice || [],
+      dailySentences: pack.dailySentences || [],
       // Chỉ gói Nhật có bảng kana; các gói khác trả null.
       kana: pack.kana || null,
     };

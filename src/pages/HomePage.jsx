@@ -24,13 +24,18 @@ const FEATURES = [
 ];
 
 // Nội dung 2 thẻ lộ trình + thẻ kho từ đổi theo ngôn ngữ đang chọn.
-function featuresFor(isJa, totalWords) {
+function featuresFor(isJa, isZhTw, totalWords) {
   const roadmapCards = isJa
     ? [
         { icon: '🗾', title: 'Lộ trình JLPT N5 → N3', desc: '3 cấp độ, 27 chủ đề từ sơ cấp đến trung cấp', to: '/roadmap' },
         { icon: '🈶', title: 'Bảng Hiragana & Katakana', desc: 'Học bảng kana, số đếm và cách đếm đồ kiểu Nhật', to: '/kana' },
       ]
-    : [FEATURES[1], FEATURES[2]];
+    : isZhTw
+      ? [
+          { icon: '🧧', title: 'Lộ trình TOCFL A1 → B1', desc: 'Học tiếng Trung phồn thể theo trình độ TOCFL', to: '/roadmap' },
+          { icon: '✍️', title: 'Luyện viết phồn thể', desc: 'Làm quen chữ Hán phồn thể thông dụng', to: '/study' },
+        ]
+      : [FEATURES[1], FEATURES[2]];
   return [
     FEATURES[0],
     ...roadmapCards,
@@ -38,7 +43,7 @@ function featuresFor(isJa, totalWords) {
     {
       icon: '📚',
       title: `Kho ${totalWords.toLocaleString('vi-VN')} từ vựng`,
-      desc: isJa ? 'Từ vựng JLPT N5 – N3, 27 chủ đề đời sống' : '26 chủ đề theo mục tiêu TOEIC và IELTS',
+      desc: isJa ? 'Từ vựng JLPT N5 – N3, 27 chủ đề đời sống' : isZhTw ? 'Từ vựng tiếng Trung phồn thể theo chủ đề' : '26 chủ đề theo mục tiêu TOEIC và IELTS',
       to: '/roadmap',
     },
   ];
@@ -155,9 +160,11 @@ function HeroVisualCard({ totalKnown, streakDays, goalPct, avgScore, getLevel, x
 }
 
 export default function HomePage() {
-  const { vocabulary, topics, levels, getAllWords, grammarLessons, dailySentences, isJapanese } = useLanguage();
+  const { vocabulary, topics, levels, getAllWords, grammarLessons, dailySentences, isJapanese, lang } = useLanguage();
+  const isZhTw = lang === 'zh-tw';
   const featuresList = featuresFor(
     isJapanese,
+    isZhTw,
     Object.values(vocabulary).reduce((a, b) => a + b.length, 0),
   );
   const {
@@ -219,7 +226,7 @@ export default function HomePage() {
 
           <div className="hp-hero-eyebrow">
             <span className="hp-hero-eyebrow-dot" />
-            {isJapanese ? 'Nền tảng học tiếng Nhật' : 'Nền tảng học từ vựng'}
+            {isJapanese ? 'Nền tảng học tiếng Nhật' : isZhTw ? 'Nền tảng học tiếng Trung Phồn thể' : 'Nền tảng học từ vựng'}
           </div>
 
           <h1 className="hp-hero-title">
@@ -230,7 +237,7 @@ export default function HomePage() {
 
           <p className="hp-hero-desc">
             Flashcard + Spaced Repetition giúp nhớ lâu <strong>gấp 3 lần</strong>.
-            Lộ trình TOEIC · IELTS rõ ràng, 6 game vui nhộn.
+            {isJapanese ? 'Lộ trình JLPT rõ ràng, bảng Kana, 6 game vui nhộn.' : isZhTw ? 'Lộ trình học tiếng Trung phồn thể rõ ràng, 6 game vui nhộn.' : 'Lộ trình TOEIC · IELTS rõ ràng, 6 game vui nhộn.'}
           </p>
 
           {/* CTA buttons */}

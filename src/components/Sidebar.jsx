@@ -64,7 +64,7 @@ export default function Sidebar() {
               title={`Học ${l.name}`}
             >
               <span className="lang-switch-flag" aria-hidden="true">{l.flag}</span>
-              <span className="lang-switch-name">{l.name}</span>
+              <span className="lang-switch-name">{l.nativeName}</span>
             </button>
           ))}
         </div>

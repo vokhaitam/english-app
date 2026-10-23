@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import MapleLeaf from './MapleLeaf';
 
+const DEFAULT_CONF = { emojis: ['✨'], count: 12, minSize: 10, maxSize: 18, minDur: 14, maxDur: 24, drift: 40, spin: 180, minOpacity: 0.3, maxOpacity: 0.6 };
+
 const CONFIG = {
   spring: { emojis: ['🌸'], count: 16, minSize: 12, maxSize: 22, minDur: 11, maxDur: 20, drift: 90, spin: 360, minOpacity: 0.45, maxOpacity: 0.85 },
   summer: { emojis: ['✨'], count: 12, minSize: 10, maxSize: 18, minDur: 14, maxDur: 24, drift: 40, spin: 180, minOpacity: 0.3, maxOpacity: 0.6 },
@@ -28,24 +30,27 @@ function randGen(seed) {
 
 export default function SeasonEffect() {
   const { currentSeason } = useApp();
-  const conf = CONFIG[currentSeason] || CONFIG.spring;
+  const conf = CONFIG[currentSeason] || DEFAULT_CONF;
 
   const particles = useMemo(() => {
-    const rnd = randGen(seedFrom(currentSeason));
-    const isLeaf = !!conf.leaf;
-    return Array.from({ length: conf.count }, (_, i) => {
-      const dur = conf.minDur + rnd() * (conf.maxDur - conf.minDur);
+    const safeConf = conf || DEFAULT_CONF;
+    const rnd = randGen(seedFrom(currentSeason || 'spring'));
+    const isLeaf = !!safeConf.leaf;
+    const emojis = Array.isArray(safeConf.emojis) ? safeConf.emojis : [];
+    const count = safeConf.count || 0;
+    return Array.from({ length: count }, (_, i) => {
+      const dur = (safeConf.minDur || 10) + rnd() * ((safeConf.maxDur || 20) - (safeConf.minDur || 10));
       return {
         id: i,
         left: rnd() * 100,
-        size: conf.minSize + rnd() * (conf.maxSize - conf.minSize),
+        size: (safeConf.minSize || 10) + rnd() * ((safeConf.maxSize || 18) - (safeConf.minSize || 10)),
         duration: dur,
         delay: -rnd() * dur,
-        drift: (rnd() * 2 - 1) * conf.drift,
-        spin: (rnd() * 2 - 1) * conf.spin,
-        opacity: conf.minOpacity + rnd() * (conf.maxOpacity - conf.minOpacity),
+        drift: (rnd() * 2 - 1) * (safeConf.drift || 0),
+        spin: (rnd() * 2 - 1) * (safeConf.spin || 0),
+        opacity: (safeConf.minOpacity || 0.3) + rnd() * ((safeConf.maxOpacity || 0.6) - (safeConf.minOpacity || 0.3)),
         leaf: isLeaf,
-        emoji: isLeaf ? null : conf.emojis[Math.floor(rnd() * conf.emojis.length)],
+        emoji: isLeaf || emojis.length === 0 ? null : emojis[Math.floor(rnd() * emojis.length)],
       };
     });
   }, [currentSeason, conf]);

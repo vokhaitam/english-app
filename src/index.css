@@ -3365,10 +3365,10 @@ body.sidebar-collapsed { --sidebar-w: 78px; }
     min-height: 52px;
   }
 
-  /* Hero/feature cards on home */
+  /* Home hero and feature cards */
   .feature-card,
   .home-feature,
-  [class*="hero"] {
+  .hp-hero {
     padding: 16px !important;
   }
 
@@ -6860,7 +6860,24 @@ body.sidebar-collapsed .main-content { margin-left: 78px; }
 
 @media (max-width: 640px) {
   .study-hero { padding: 28px 20px; }
-  .study-hero-stats { gap: 14px; padding: 10px 18px; }
+  .study-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: var(--radius-lg);
+  }
+  .study-hero-stat { min-width: 0; }
+  .study-hero-stat-label {
+    max-width: 100%;
+    text-align: center;
+    letter-spacing: 0.03em;
+    overflow-wrap: anywhere;
+  }
+  .study-hero-stat-divider { display: none; }
   .study-level-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
   .study-search { max-width: 100%; }
 }
